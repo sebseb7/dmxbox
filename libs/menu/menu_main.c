@@ -15,6 +15,7 @@ void menu_main()
 
 	if(redraw)
 	{
+		clearDisplay();
 		clear_buttons();
 		redraw=0;
 

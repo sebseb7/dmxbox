@@ -34,7 +34,7 @@ void menu_setup()
 		draw_button_icon(11,110,92,1,"Scenes",155,0,0,0,255,0);
 		draw_button_icon(114,110,92,1,"Devices",155,0,0,0,255,0);
 		draw_button_icon(217,110,92,1,"",55,55,55,0,255,0);
-		draw_button_icon(11,175,92,1,"",55,55,55,0,255,0);
+		draw_button_icon(11,175,92,1,"Map CTRL",155,0,0,0,255,0);
 		draw_button_icon(114,175,92,1,"",55,55,55,0,255,0);
 		draw_button_icon(217,175,92,1,"General",155,0,0,0,255,0);
 	}

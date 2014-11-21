@@ -65,6 +65,7 @@ void menu_main()
 		}
 		if(field == 9)
 		{
+			redraw=1;
 			set_current_execution(menu_setup);
 		}
 	}

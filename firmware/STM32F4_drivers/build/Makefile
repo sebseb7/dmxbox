@@ -15,6 +15,7 @@ SRCS = \
 ../src/stm32f4xx_dma.c \
 ../src/stm32f4xx_exti.c \
 ../src/stm32f4xx_gpio.c \
+../src/stm32f4xx_fsmc.c \
 ../src/stm32f4xx_i2c.c \
 ../src/stm32f4xx_rcc.c \
 ../src/stm32f4xx_rng.c \

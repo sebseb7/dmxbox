@@ -17,7 +17,8 @@ SRC=$(wildcard  *.c usb/*.c midi/*.c libs/*.c) \
 	core/startup_stm32f4xx.c \
 	core/stm32fxxx_it.c \
 	core/syscalls.c \
-	core/system_stm32f$(STM32F)xx.c 
+	core/system_stm32f$(STM32F)xx.c \
+	lcd_a/stm32f4_discovery_lcd.c
 
 #ASRC=core/startup_stm32f$(STM32F)xx.s
 OBJECTS= $(SRC:.c=.o)

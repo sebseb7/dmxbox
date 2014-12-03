@@ -31,6 +31,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "main.h"
+#include "lcd_a/stm32f4_discovery_lcd.h"
 
 /*---------------------------------------------------------------------------*/
 
@@ -88,6 +89,30 @@ int main(void)
 	packet.channel = 0;
 	packet.type = CC;
 	packet.cc = 32;
+
+
+	STM32f4_Discovery_LCD_Init();
+	LCD_SetCursor(0x00, 0x00); 
+	LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
+
+
+
+	while(1)
+	{
+
+		for(int y = 0; y < LCD_PIXEL_HEIGHT; y++) 
+		{
+
+			for(int x = 0; x < LCD_PIXEL_WIDTH; x++) 
+			{
+
+				LCD_WriteRAM(0xff);
+				LCD_WriteRAM(0);
+			}
+		}
+	}	
+
+	
 
 
 	int position = 0;

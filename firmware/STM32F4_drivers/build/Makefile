@@ -6,7 +6,7 @@ RANLIB = arm-none-eabi-ranlib
 
 CFLAGS = -Wall -O2 -mthumb
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -falign-functions=16
-CFLAGS += -mcpu=cortex-m4 -fsingle-precision-constant -funsigned-char -Wundef -Wsign-compare -Wunreachable-code -Wstrict-prototypes
+CFLAGS += -mcpu=cortex-m4 -fsingle-precision-constant -funsigned-char -Wundef -Wsign-compare -Wunreachable-code -Wstrict-prototypes -flto
 CFLAGS += -I../inc -I../../core -DARM_MATH_CM4 -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -D__FPU_USED=1 -DHSE_VALUE=8000000 -DSTM32F407VG
 
 SRCS = \

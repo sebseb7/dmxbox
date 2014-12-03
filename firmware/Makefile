@@ -13,12 +13,13 @@ CORTEXM=4
 endif
 
 
-SRC=$(wildcard  *.c usb/*.c midi/*.c libs/*.c) \
+SRC=$(wildcard  *.c usb/*.c midi/*.c libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c) \
 	core/startup_stm32f4xx.c \
 	core/stm32fxxx_it.c \
 	core/syscalls.c \
 	core/system_stm32f$(STM32F)xx.c \
-	lcd_a/stm32f4_discovery_lcd.c
+	lcd_a/stm32f4_discovery_lcd.c \
+	lcd_a/STMPE811QTR.c
 
 #ASRC=core/startup_stm32f$(STM32F)xx.s
 OBJECTS= $(SRC:.c=.o)
@@ -27,7 +28,7 @@ LSTFILES= $(SRC:.c=.lst)
 HEADERS=$(wildcard usb/*.h core/*.h *.h midi/*.h libs/*.h)
 
 #  Compiler Options
-GCFLAGS = -DSTM32F=$(STM32F) -ffreestanding -std=gnu99 -mcpu=cortex-m$(CORTEXM) -mthumb $(OPTIMIZATION) -I. -Imidi -Icore -Iusb -DARM_MATH_CM$(CORTEXM) -DSTM32F40_41xxx -D__FPU_USED=1 -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=8000000 -DSTM32F407VG -flto
+GCFLAGS = -DSTM32F=$(STM32F) -ffreestanding -std=gnu99 -mcpu=cortex-m$(CORTEXM) -mthumb $(OPTIMIZATION) -I. -Imidi -Icore -Iusb -I.. -I../libs -DARM_MATH_CM$(CORTEXM) -DSTM32F40_41xxx -D__FPU_USED=1 -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=8000000 -DSTM32F407VG -flto
 ifeq ($(CORTEXM),4)
 GCFLAGS+= -mfpu=fpv4-sp-d16 -mfloat-abi=hard -falign-functions=16 
 endif

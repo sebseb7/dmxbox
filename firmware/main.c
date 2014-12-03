@@ -31,7 +31,9 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "main.h"
-#include "lcd_a/stm32f4_discovery_lcd.h"
+#include "menu/menu_main.h"
+#include "menu/menu_setup.h"
+#include "lcd_a/stmpe811qtr.h"
 
 /*---------------------------------------------------------------------------*/
 
@@ -66,6 +68,124 @@ void USB_Host_Handle()
 	}
 }
 
+static void (*current_execution)(void);
+void set_current_execution(void (*new_execution)(void))
+{
+	current_execution = new_execution;
+}
+
+static uint16_t leds[LCD_HEIGHT-100][LCD_WIDTH];
+static uint16_t leds_a[100][LCD_WIDTH] __attribute__((section(".ccm")));
+
+	
+
+void clearDisplay()
+{
+	int x, y;
+	for(x = 0; x < LCD_WIDTH; x++) {
+		for(y = 0; y < LCD_HEIGHT; y++) {
+			if(y < (LCD_HEIGHT-100))
+			{
+				leds[y][x] = 0;
+			}else{
+				leds_a[y-140][x] = 0;
+			}
+//			leds[y][x][1] = 0;
+//			leds[y][x][2] = 0;
+		}
+	}
+}
+
+void setLedXY(uint16_t x, uint16_t y, uint8_t red,uint8_t green, uint8_t blue) {
+	if (x >= LCD_WIDTH) return;
+	if (y >= LCD_HEIGHT) return;
+	if(y < (LCD_HEIGHT-100))
+	{
+		leds[y][x] = (( (red   >> 3) & 0x001f ) << 11 | ( (green >> 2) & 0x003f ) << 5 | ((blue  >> 3) & 0x001f));
+	}
+	else
+	{
+		leds_a[y-140][x] = (( (red   >> 3) & 0x001f ) << 11 | ( (green >> 2) & 0x003f ) << 5 | ((blue  >> 3) & 0x001f));
+	}
+//	leds[y][x][1] = green;
+//	leds[y][x][2] = blue;
+}
+
+void invLedXY(uint16_t x, uint16_t y) {
+	if (x >= LCD_WIDTH) return;
+	if (y >= LCD_HEIGHT) return;
+//	leds[y][x][0] = 255 - leds[y][x][0];
+//	leds[y][x][1] = 255 - leds[y][x][1];
+//	leds[y][x][2] = 255 - leds[y][x][2];
+}
+void getLedXY(uint16_t x, uint16_t y, uint8_t* red,uint8_t* green, uint8_t* blue) {
+	if (x >= LCD_WIDTH) return;
+	if (y >= LCD_HEIGHT) return;
+	
+	if(y < (LCD_HEIGHT-100))
+	{
+		*red = (uint8_t) (leds[y][x] >> 11)<<3;
+		*green = (uint8_t) (leds[y][x] >> 5) << 2;
+		*blue = (uint8_t) leds[y][x] << 3;
+	}else{
+		*red = (uint8_t) (leds_a[y-140][x] >> 11)<<3;
+		*green = (uint8_t) (leds_a[y-140][x] >> 5) << 2;
+		*blue = (uint8_t) leds_a[y-140][x] << 3;
+	}
+	
+}
+
+struct button_press_t {    
+
+	uint16_t x;
+	uint16_t y;
+	
+	struct button_press_t *next;
+	struct button_press_t *last;
+};
+static struct button_press_t *current;
+static struct button_press_t *last;
+
+static void add_button_press(uint16_t x,uint16_t y)
+{
+
+	struct button_press_t *p;
+
+	p = (struct button_press_t *)malloc(sizeof(struct button_press_t));
+
+	p->x = x;
+	p->y = y;
+	p->last=NULL;
+
+	if(current != NULL)
+	{
+		current->last=p;
+		p->next = current;
+	}else
+	{
+		p->next=NULL;
+		last=p;
+	}
+
+	current=p;
+}
+static void remove_last(void)
+{
+	if(last == current)
+	{
+		free(last);
+		current=NULL;
+		last=NULL;
+	}
+	else
+	{
+		struct button_press_t *p = last->last;
+		free(last);
+		last=p;
+		last->next=NULL;
+	}
+}
+
 int main(void)
 {
 	RCC_ClocksTypeDef RCC_Clocks;
@@ -96,23 +216,66 @@ int main(void)
 	LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
 
 
+	current_execution = menu_main;
+
+	TS_STATE *pstate = NULL;
+	IOE_Config();
+
+	int oldx;
+	int oldy;
 
 	while(1)
 	{
-
+		current_execution();
+		
 		for(int y = 0; y < LCD_PIXEL_HEIGHT; y++) 
 		{
 
 			for(int x = 0; x < LCD_PIXEL_WIDTH; x++) 
 			{
 
-				LCD_WriteRAM(0xff);
-				LCD_WriteRAM(0);
+				
+				if(y < (LCD_HEIGHT-100))
+				{
+					uint8_t red = (uint8_t) (leds[y][x] >> 11)<<3;
+					uint8_t green = (uint8_t) (leds[y][x] >> 5) << 2;
+					uint8_t blue = (uint8_t) leds[y][x] << 3;
+			
+					LCD_WriteRAM(red*0x100+green);
+					LCD_WriteRAM(blue);
+				}
+				else
+				{
+					uint8_t red = (uint8_t) (leds_a[y-140][x] >> 11)<<3;
+					uint8_t green = (uint8_t) (leds_a[y-140][x] >> 5) << 2;
+					uint8_t blue = (uint8_t) leds_a[y-140][x] << 3;
+				
+					LCD_WriteRAM(red*0x100+green);
+					LCD_WriteRAM(blue);
+				}
+	
 			}
 		}
-	}	
+		pstate = IOE_TS_GetState();
+		if(pstate->TouchDetected)
+		{
+			int x = pstate->X-350;
+			if(x<0) x=0;
+			int y = pstate->Y-420;
+			if(y<0) y=0;
+			y/=13.33f;
+			x/=10.62f;
+			x=320-x;
 
-	
+			add_button_press(x, y);
+			/*draw_number_8x6(100, 100, oldx,4,'0',0,0,0);
+			draw_number_8x6(100, 150, oldy,4,'0',0,0,0);
+			draw_number_8x6(100, 100, x,4,'0',255,255,255);
+			draw_number_8x6(100, 150, y,4,'0',255,255,255);*/
+			oldx=x;
+			oldy=y;
+		}
+	}
 
 
 	int position = 0;
@@ -139,4 +302,26 @@ void MIDI_recv_cb(MIDI_EventPacket_t packet)
 {
 	MIDI_send(packet);
 }
+
+
+void clear_buttons()
+{
+	while(last!=NULL)
+	{
+		remove_last();
+	}
+}
+
+int check_button_press(uint16_t* x,uint16_t* y)
+{
+	if(last != NULL)
+	{
+		*x = last->x;
+		*y = last->y;
+		remove_last();
+		return 1;
+	}
+	return 0;
+}
+
 

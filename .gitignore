@@ -5,4 +5,4 @@
 *.lst
 firmware/tools/flash/st-flash
 sim/sim
-
+!firmware/audio/libPDMFilter_GCC.a

@@ -3,6 +3,6 @@
 *.bin
 *.elf
 *.lst
-tools/flash/st-flash
+firmware/tools/flash/st-flash
 sim/sim
 

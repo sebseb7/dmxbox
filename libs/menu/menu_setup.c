@@ -1,5 +1,6 @@
 
 #include "menu_setup.h"
+#include "menu_setup_devices.h"
 #include "menu_main.h"
 #include "main.h"
 #include "mcugui/rect.h"
@@ -73,8 +74,10 @@ void menu_setup()
 			}
 		}
 		
-		if(field == 9)
+		if(field == 5)
 		{
+			redraw=1;
+			set_current_execution(menu_setup_devices);
 		}
 	}
 }

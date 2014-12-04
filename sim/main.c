@@ -298,6 +298,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 			if(e.x < 8)
 			{
 				midi_fader[e.x]=e.y*2;
+				if(midi_fader[e.x] > 127) midi_fader[e.x]++;
 				fader_updated[e.x]=1;
 			}
 
@@ -333,7 +334,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 
 
 		SDL_Flip(screen);
-
+		SDL_Delay(20);
 	}
 
 	SDL_Quit();

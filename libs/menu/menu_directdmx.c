@@ -105,6 +105,8 @@ void menu_directdmx()
 				uint8_t barsize = 54 - (direct_ch[chan+row*8] * 0.211764f);
 
 				draw_filledRect(11+(chan*(33+5))+2,45+(row*(58+5))+2+barsize,33-4,58-(4+barsize),100,200,100);
+	
+				draw_number_8x6(11+(chan*(33+5)+9),45+(row*(58+5))+22, direct_ch[chan+row*8],3,' ',255,255,255);
 			}
 		}
 

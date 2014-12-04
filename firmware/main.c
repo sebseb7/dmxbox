@@ -357,6 +357,7 @@ void MIDI_recv_cb(MIDI_EventPacket_t packet)
 	if(packet.cc < 8)
 	{
 		midi_fader[packet.cc]=packet.value*2;
+		if(midi_fader[packet.cc] > 127) midi_fader[packet.cc]++;
 		fader_updated[packet.cc]=1;
 	}
 	draw_number_8x6(100, 100, packet.cc,4,'0',255,255,255);

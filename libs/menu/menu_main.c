@@ -2,6 +2,7 @@
 #include "menu_main.h"
 #include "menu_setup.h"
 #include "menu_directdmx.h"
+#include "screen_keyboard.h"
 #include "main.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
@@ -73,6 +74,11 @@ void menu_main()
 		{
 			redraw=1;
 			set_current_execution(menu_directdmx);
+		}
+		else if(field == 8)
+		{
+			redraw=1;
+			set_current_execution(screen_keyboard);
 		}
 	}
 

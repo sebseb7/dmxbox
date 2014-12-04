@@ -10,11 +10,11 @@
 static uint8_t redraw = 1;
 
 
-static uint8_t keyboard_layout[12*4] = {
-											'1','2','3','4','5','6','7','8','9','0',' ',' ',
-											  'Q','W','E','R','T','Z','U','I','O','P',' ',' ',
-											' ','A','S','D','F','G','H','J','K','L',' ',' ',
-											  ' ','Y','X','C','V','B','N','M',' ',' ',' ',' '
+static uint8_t keyboard_layout[11*4] = {
+											'1','2','3','4','5','6','7','8','9','0',' ',
+											  'Q','W','E','R','T','Z','U','I','O','P',' ',
+											' ','A','S','D','F','G','H','J','K','L',' ',
+											  ' ','Y','X','C','V','B','N','M',127,126,' '
 											};
 
 static uint8_t cursor_pos = 0;
@@ -42,31 +42,33 @@ void screen_keyboard()
 		
 		for(int row=0;row<4;row++)
 		{
-			for(int chan=0;chan<12;chan++)
+			for(int chan=0;chan<11;chan++)
 			{//298*
 
 				if((row==0)&&(chan>9)) continue;
 				if((row==1)&&(chan>9)) continue;
 				if((row==2)&&(chan>9)) continue;
 				if((row==2)&&(chan<1)) continue;
-				if((row==3)&&(chan>7)) continue;
+				if((row==3)&&(chan>9)) continue;
 				if((row==3)&&(chan<1)) continue;
 				uint8_t offset=0;
 				if(row%2) offset=12;
-				draw_filledRect(11+(chan*(23+2))+offset,60+45+(row*(23+2)),23,23,100,100,100);
+				draw_filledRect(10+(chan*(25+2))+offset,50+45+(row*(25+2)),25,25,100,100,100);
 	
 				char buf[2];
-				sprintf(buf, "%c", keyboard_layout[row*12+chan]);
+				sprintf(buf, "%c", keyboard_layout[row*11+chan]);
 
-				draw_text_8x6(10+11+(chan*(23+2))+offset,5+60+45+(row*(23+2)),buf,255,255,255);
+				draw_text_8x6(11+10+(chan*(25+2))+offset,6+50+45+(row*(25+2)),buf,255,255,255);
 
 			}
 		}
-		draw_filledRect(11+(10*(23+2))+0,60+45+(0*(23+2)),23*2+2*1,23,100,100,100);//backspace
-		draw_filledRect(11+(10*(23+2))+12,60+45+(1*(23+2)),23*2+2*1-12,23+2,100,100,100);//enter part1
-		draw_filledRect(11+(10*(23+2))+0,60+45+(2*(23+2)),23*2+2*1,23,100,100,100);//enter part2
-		draw_filledRect(11+(0*(23+2))+0,60+45+(4*(23+2)),23*12+2*10,23,100,100,100);//space
+		draw_filledRect(10+(10*(25+2))+0,50+45+(0*(25+2)),25,25,100,100,100);//backspace
+		draw_filledRect(10+(10*(25+2))+12,50+45+(1*(25+2)),25-12,25+2,100,100,100);//enter part1
+		draw_filledRect(10+(10*(25+2))+0,50+45+(2*(25+2)),25,25,100,100,100);//enter part2
+		draw_filledRect(10+( 2*(25+2))+0,50+45+(4*(25+2)),25*7+2*6,25,100,100,100);//space
 
+		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(0*(25+2)),"DEL",255,255,255);
+		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(2*(25+2)),"RET",255,255,255);
 	}
 		
 	draw_text_8x6(70,50,"123456789012345678901234567890",255,100,100);

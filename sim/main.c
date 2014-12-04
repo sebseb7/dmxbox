@@ -13,6 +13,8 @@
 #include "menu/menu_main.h"
 #include "menu/menu_setup.h"
 
+#include "keyboard.h"
+
 static uint8_t leds[LCD_HEIGHT][LCD_WIDTH][4];
 
 void clearDisplay()
@@ -126,21 +128,12 @@ void clear_buttons()
 	printf("\n");
 }
 
-void clear_buttons_midi(void)
-{
-}
-int check_button_press_midi(uint8_t* cc,uint8_t* value)
-{
-	return 0;
-}
+	
+MidiObj midi_korg;
 
-uint8_t MIDI_get_fader(uint8_t ch)
+void MIDI_send_cc(uint8_t cc,uint8_t value)
 {
-	return 0;
-}
-uint8_t MIDI_get_fader_updated(uint8_t ch)
-{
-	return 0;
+	keyboard_send(&midi_korg,176,cc,value);
 }
 
 
@@ -148,6 +141,99 @@ static void (*current_execution)(void);
 void set_current_execution(void (*new_execution)(void))
 {
 	current_execution = new_execution;
+}
+
+struct midi_button_press_t {    
+
+	uint8_t cc;
+	uint8_t value;
+	
+	struct midi_button_press_t *next;
+	struct midi_button_press_t *last;
+};
+static struct midi_button_press_t *current_midi;
+static struct midi_button_press_t *last_midi;
+
+static void add_midi_button_press(uint8_t cc,uint8_t value)
+{
+
+	struct midi_button_press_t *p;
+
+	p = (struct midi_button_press_t *)malloc(sizeof(struct midi_button_press_t));
+
+	p->cc = cc;
+	p->value = value;
+	p->last=NULL;
+
+	if(current_midi != NULL)
+	{
+		current_midi->last=p;
+		p->next = current_midi;
+	}else
+	{
+		p->next=NULL;
+		last_midi=p;
+	}
+
+	current_midi=p;
+}
+static void remove_last_midi(void)
+{
+	if(last_midi == current_midi)
+	{
+		free(last_midi);
+		current_midi=NULL;
+		last_midi=NULL;
+	}
+	else
+	{
+		struct midi_button_press_t *p = last_midi->last;
+		free(last_midi);
+		last_midi=p;
+		last_midi->next=NULL;
+	}
+}
+
+void clear_buttons_midi()
+{
+	while(last_midi!=NULL)
+	{
+		remove_last_midi();
+	}
+}
+int check_button_press_midi(uint8_t* cc,uint8_t* value)
+{
+	if(last_midi != NULL)
+	{
+		*cc = last_midi->cc;
+		*value = last_midi->value;
+		remove_last_midi();
+		return 1;
+	}
+	return 0;
+}
+static uint8_t midi_fader[8];
+static uint8_t fader_updated[8];
+uint8_t MIDI_get_fader(uint8_t ch)
+{
+	if(ch > 7) return 0;
+	return midi_fader[ch];
+
+}
+uint8_t MIDI_get_fader_updated(uint8_t ch)
+{
+	if(ch > 7) return 0;
+	if(fader_updated[ch]==1)
+	{
+		fader_updated[ch]=0;
+		return 1;
+	}
+	return 0;
+}
+void clear_faders()
+{
+	for(int i = 0 ; i < 8; i++)
+		fader_updated[i]=0;
 }
 
 int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unused__))) {
@@ -161,6 +247,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 
 	int running = 1;
 
+	keyboard_init(&midi_korg,"nanoKONTROL");
 
 	current_execution = menu_main;
 
@@ -204,6 +291,22 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 				default: break;
 			}
 		}
+		
+		KeyboardEvent e;
+		while(keyboard_poll(&midi_korg,&e)) 
+		{
+			if(e.x < 8)
+			{
+				midi_fader[e.x]=e.y*2;
+				fader_updated[e.x]=1;
+			}
+
+			if((e.x > 42)&&(e.x < 45))
+			{
+				add_midi_button_press(e.x,e.y);
+			}
+		}
+
 
 		current_execution();
 

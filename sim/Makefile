@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 COMPILER = gcc
 
 
-FLAGS= -I. -I.. -I../libs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto 
+FLAGS= -I. -I.. -I../libs -Ilibs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto -lportmidi 
 
 #-fsingle-precision-constant
 LDFLAGS=
@@ -28,8 +28,8 @@ ifeq ($(UNAME), MINGW32_NT-6.1)
 	BINEXT = .exe
 endif
 
-LIB_SOURCES=$(wildcard ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c)
-LIB_HEADERS=$(wildcard ../libs/*.h ../libs/menu/*.h ../libs/mcugui/*.h)
+LIB_SOURCES=$(wildcard libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c)
+LIB_HEADERS=$(wildcard libs/*.h ../libs/*.h ../libs/menu/*.h ../libs/mcugui/*.h)
 
 all: sim
 

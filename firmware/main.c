@@ -383,6 +383,16 @@ uint8_t MIDI_get_fader_updated(uint8_t ch)
 	}
 	return 0;
 }
+			
+void MIDI_send_cc(uint8_t cc,uint8_t value)
+{
+	MIDI_EventPacket_t packet;
+	packet.channel = 0;
+	packet.type = CC;
+	packet.cc = cc;
+	packet.value = value;
+	MIDI_send(packet);
+}
 
 
 void clear_buttons()

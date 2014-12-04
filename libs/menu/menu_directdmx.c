@@ -7,7 +7,6 @@
 #include "mcugui/text.h"
 #include "mcugui/circle.h"
 #include "mcugui/button.h"
-#include "usbh_midi_core.h"
 
 static uint8_t redraw = 1;
 
@@ -66,26 +65,22 @@ void menu_directdmx()
 		clear_buttons();
 		redraw=0;
 
-		MIDI_EventPacket_t packet;
-		packet.channel = 0;
-		packet.type = CC;
-		packet.cc = 43;
-		packet.value = 0;
 		if(current_bank<2)
 		{
-			packet.value = 127;
-		}
-		MIDI_send(packet);
-		packet.cc = 44;
-		if(current_bank>0)
-		{
-			packet.value=127;
+			MIDI_send_cc(43,127);
 		}
 		else
 		{
-			packet.value=0;
+			MIDI_send_cc(43,0);
 		}
-		MIDI_send(packet);
+		if(current_bank>0)
+		{
+			MIDI_send_cc(44,127);
+		}
+		else
+		{
+			MIDI_send_cc(44,0);
+		}
 
 		draw_filledRect(0,0,LCD_WIDTH,35,155,100,100);
 
@@ -161,16 +156,8 @@ void menu_directdmx()
 		
 		if(redraw==1)
 		{
-		
-			MIDI_EventPacket_t packet;
-			packet.channel = 0;
-			packet.type = CC;
-			packet.cc = 43;
-			packet.value = 0;
-			MIDI_send(packet);
-			packet.cc = 44;
-			packet.value=0;
-			MIDI_send(packet);
+			MIDI_send_cc(43,0);
+			MIDI_send_cc(44,0);
 		}
 	}
 }

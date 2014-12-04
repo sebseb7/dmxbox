@@ -53,7 +53,13 @@ void screen_keyboard()
 				if((row==3)&&(chan<1)) continue;
 				uint8_t offset=0;
 				if(row%2) offset=12;
-				draw_filledRect(10+(chan*(25+2))+offset,50+45+(row*(25+2)),25,25,100,100,100);
+				if(keyboard_layout[row*11+chan] > 125)
+				{
+					//offset+=15;
+					draw_filledRect(10+(chan*(25+2))+offset,50+45+(row*(25+2)),25,25,110,110,80);
+				}else{
+					draw_filledRect(10+(chan*(25+2))+offset,50+45+(row*(25+2)),25,25,100,100,100);
+				}
 	
 				char buf[2];
 				sprintf(buf, "%c", keyboard_layout[row*11+chan]);
@@ -62,10 +68,10 @@ void screen_keyboard()
 
 			}
 		}
-		draw_filledRect(10+(10*(25+2))+0,50+45+(0*(25+2)),25,25,100,100,100);//backspace
-		draw_filledRect(10+(10*(25+2))+12,50+45+(1*(25+2)),25-12,25+2,100,100,100);//enter part1
-		draw_filledRect(10+(10*(25+2))+0,50+45+(2*(25+2)),25,25,100,100,100);//enter part2
-		draw_filledRect(10+( 2*(25+2))+0,50+45+(4*(25+2)),25*7+2*6,25,100,100,100);//space
+		draw_filledRect(10+(10*(25+2))+0,50+45+(0*(25+2)),25,25,110,90,90);//backspace
+		draw_filledRect(10+(10*(25+2))+12,50+45+(1*(25+2)),25-12,25+2,80,80,120);//enter part1
+		draw_filledRect(10+(10*(25+2))+0,50+45+(2*(25+2)),25,25,80,80,120);//enter part2
+		draw_filledRect(10+( 2*(25+2))+0,50+45+(4*(25+2)),25*7+2*6,25,80,120,80);//space
 
 		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(0*(25+2)),"DEL",255,255,255);
 		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(2*(25+2)),"RET",255,255,255);

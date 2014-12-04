@@ -365,7 +365,7 @@ void MIDI_recv_cb(MIDI_EventPacket_t packet)
 	{
 		add_midi_button_press(packet.cc,packet.value);
 	}
-	MIDI_send(packet);
+	//MIDI_send(packet);
 }
 
 uint8_t MIDI_get_fader(uint8_t ch)
@@ -392,6 +392,11 @@ void clear_buttons()
 		remove_last();
 	}
 }
+void clear_faders()
+{
+	for(int i = 0 ; i < 8; i++)
+		fader_updated[i]=0;
+}
 void clear_buttons_midi()
 {
 	while(last_midi!=NULL)
@@ -414,7 +419,7 @@ int check_button_press(uint16_t* x,uint16_t* y)
 
 int check_button_press_midi(uint8_t* cc,uint8_t* value)
 {
-	if(last != NULL)
+	if(last_midi != NULL)
 	{
 		*cc = last_midi->cc;
 		*value = last_midi->value;

@@ -7,30 +7,55 @@
 #include "mcugui/text.h"
 #include "mcugui/circle.h"
 #include "mcugui/button.h"
+#include "usbh_midi_core.h"
 
 static uint8_t redraw = 1;
 
 
-static uint8_t direct_ch[8*3];
+static uint8_t direct_ch[8*3] = { 0 };;
 
 static uint8_t initialized = 0;
 
+static uint8_t current_bank=0;
 void menu_directdmx()
 {
 
 	if(! initialized)
 	{
 		initialized=1;
-		for(int i = 0 ; i < 8*3;i++)
+	/*	for(int i = 0 ; i < 8*3;i++)
 			direct_ch[i]=0;
-			
+		current_bank=0;*/
+	}
+	
+	if(redraw)
+	{
+		clear_buttons_midi();
+		clear_faders();
 	}
 
+
+	uint8_t cc;
+	uint8_t value;
+	while(check_button_press_midi(&cc,&value)==1)
+	{
+		if((cc==43)&&(value==127)&&(current_bank>0))
+		{
+			current_bank--;
+			redraw=1;
+		}
+		if((cc==44)&&(value==127)&&(current_bank<2))
+		{
+			current_bank++;
+			redraw=1;
+		}
+	}
+	
 	for(int i=0;i<8;i++)
 	{
 		if(MIDI_get_fader_updated(i))
 		{
-			direct_ch[i]=MIDI_get_fader(i);
+			direct_ch[i+(current_bank*8)]=MIDI_get_fader(i);
 			redraw=1;
 		}
 	}
@@ -39,8 +64,28 @@ void menu_directdmx()
 	{
 		clearDisplay();
 		clear_buttons();
-		clear_buttons_midi();
 		redraw=0;
+
+		MIDI_EventPacket_t packet;
+		packet.channel = 0;
+		packet.type = CC;
+		packet.cc = 43;
+		packet.value = 0;
+		if(current_bank<2)
+		{
+			packet.value = 127;
+		}
+		MIDI_send(packet);
+		packet.cc = 44;
+		if(current_bank>0)
+		{
+			packet.value=127;
+		}
+		else
+		{
+			packet.value=0;
+		}
+		MIDI_send(packet);
 
 		draw_filledRect(0,0,LCD_WIDTH,35,155,100,100);
 
@@ -58,9 +103,11 @@ void menu_directdmx()
 		{
 			for(int chan=0;chan<8;chan++)
 			{
-				draw_filledRect(11+(chan*(33+5)),45+(row*(58+5)),33,58,100,100,200);
+				uint8_t bg_col = 100;
+				if(current_bank==row) bg_col=200;
+				draw_filledRect(11+(chan*(33+5)),45+(row*(58+5)),33,58,100,100,bg_col);
 
-				uint8_t barsize = 54 - (direct_ch[chan] * 0.211764f);
+				uint8_t barsize = 54 - (direct_ch[chan+row*8] * 0.211764f);
 
 				draw_filledRect(11+(chan*(33+5))+2,45+(row*(58+5))+2+barsize,33-4,58-(4+barsize),100,200,100);
 			}
@@ -110,6 +157,20 @@ void menu_directdmx()
 		
 		if(field == 9)
 		{
+		}
+		
+		if(redraw==1)
+		{
+		
+			MIDI_EventPacket_t packet;
+			packet.channel = 0;
+			packet.type = CC;
+			packet.cc = 43;
+			packet.value = 0;
+			MIDI_send(packet);
+			packet.cc = 44;
+			packet.value=0;
+			MIDI_send(packet);
 		}
 	}
 }

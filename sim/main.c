@@ -126,6 +126,22 @@ void clear_buttons()
 	printf("\n");
 }
 
+void clear_buttons_midi(void)
+{
+}
+int check_button_press_midi(uint8_t* cc,uint8_t* value)
+{
+	return 0;
+}
+
+uint8_t MIDI_get_fader(uint8_t ch)
+{
+	return 0;
+}
+uint8_t MIDI_get_fader_updated(uint8_t ch)
+{
+	return 0;
+}
 
 
 static void (*current_execution)(void);

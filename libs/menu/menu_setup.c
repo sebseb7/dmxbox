@@ -20,8 +20,8 @@ void menu_setup()
 
 		draw_filledRect(0,0,LCD_WIDTH,35,155,100,100);
 
-		draw_filledCircle(17,17,15,100,130,100);
-		draw_text_8x6(7,10,"Back",185,100,100);
+		draw_filledCircle(17,17,15,40,80,40);
+		draw_text_8x6(7,10,"Back",255,100,100);
 
 		uint16_t text_width =  get_text_width_16pt("SETUP");
 

@@ -1,6 +1,7 @@
 
 #include "menu_main.h"
 #include "menu_setup.h"
+#include "menu_directdmx.h"
 #include "main.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
@@ -67,6 +68,11 @@ void menu_main()
 		{
 			redraw=1;
 			set_current_execution(menu_setup);
+		}
+		else if(field == 7)
+		{
+			redraw=1;
+			set_current_execution(menu_directdmx);
 		}
 	}
 

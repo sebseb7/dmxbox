@@ -186,6 +186,57 @@ static void remove_last(void)
 	}
 }
 
+struct midi_button_press_t {    
+
+	uint8_t cc;
+	uint8_t value;
+	
+	struct midi_button_press_t *next;
+	struct midi_button_press_t *last;
+};
+static struct midi_button_press_t *current_midi;
+static struct midi_button_press_t *last_midi;
+
+static void add_midi_button_press(uint8_t cc,uint8_t value)
+{
+
+	struct midi_button_press_t *p;
+
+	p = (struct midi_button_press_t *)malloc(sizeof(struct midi_button_press_t));
+
+	p->cc = cc;
+	p->value = value;
+	p->last=NULL;
+
+	if(current_midi != NULL)
+	{
+		current_midi->last=p;
+		p->next = current_midi;
+	}else
+	{
+		p->next=NULL;
+		last_midi=p;
+	}
+
+	current_midi=p;
+}
+static void remove_last_midi(void)
+{
+	if(last_midi == current_midi)
+	{
+		free(last_midi);
+		current_midi=NULL;
+		last_midi=NULL;
+	}
+	else
+	{
+		struct midi_button_press_t *p = last_midi->last;
+		free(last_midi);
+		last_midi=p;
+		last_midi->next=NULL;
+	}
+}
+
 int main(void)
 {
 	RCC_ClocksTypeDef RCC_Clocks;
@@ -298,9 +349,39 @@ int main(void)
 	}
 }
 
+
+static uint8_t midi_fader[8];
+static uint8_t fader_updated[8];
 void MIDI_recv_cb(MIDI_EventPacket_t packet)
 {
+	if(packet.cc < 8)
+	{
+		midi_fader[packet.cc]=packet.value*2;
+		fader_updated[packet.cc]=1;
+	}
+	draw_number_8x6(100, 100, packet.cc,4,'0',255,255,255);
+
+	if((packet.cc > 42)&&(packet.cc < 45))
+	{
+		add_midi_button_press(packet.cc,packet.value);
+	}
 	MIDI_send(packet);
+}
+
+uint8_t MIDI_get_fader(uint8_t ch)
+{
+	if(ch > 7) return 0;
+	return midi_fader[ch];
+}
+uint8_t MIDI_get_fader_updated(uint8_t ch)
+{
+	if(ch > 7) return 0;
+	if(fader_updated[ch]==1)
+	{
+		fader_updated[ch]=0;
+		return 1;
+	}
+	return 0;
 }
 
 
@@ -311,6 +392,13 @@ void clear_buttons()
 		remove_last();
 	}
 }
+void clear_buttons_midi()
+{
+	while(last_midi!=NULL)
+	{
+		remove_last_midi();
+	}
+}
 
 int check_button_press(uint16_t* x,uint16_t* y)
 {
@@ -319,6 +407,18 @@ int check_button_press(uint16_t* x,uint16_t* y)
 		*x = last->x;
 		*y = last->y;
 		remove_last();
+		return 1;
+	}
+	return 0;
+}
+
+int check_button_press_midi(uint8_t* cc,uint8_t* value)
+{
+	if(last != NULL)
+	{
+		*cc = last_midi->cc;
+		*value = last_midi->value;
+		remove_last_midi();
 		return 1;
 	}
 	return 0;

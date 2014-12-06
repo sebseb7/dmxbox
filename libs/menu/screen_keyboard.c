@@ -12,14 +12,15 @@ static uint8_t redraw = 1;
 
 static uint8_t keyboard_layout[11*4] = {
 											'1','2','3','4','5','6','7','8','9','0',' ',
-											  'Q','W','E','R','T','Z','U','I','O','P',' ',
+											'Q','W','E','R','T','Z','U','I','O','P',' ',
 											' ','A','S','D','F','G','H','J','K','L',' ',
-											  ' ','Y','X','C','V','B','N','M',127,126,' '
+											' ','Y','X','C','V','B','N','M',127,126,' '
 											};
 
 static uint8_t cursor_pos = 0;
 static uint8_t blink = 0;
 
+#define MAXLENGTH 30
 
 void screen_keyboard()
 {

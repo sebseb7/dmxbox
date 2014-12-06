@@ -11,7 +11,10 @@ struct {
 	char* name;
 	uint8_t channels;
 	uint8_t *channel_defaults; 
-
+	uint16_t *channel_defaults_blackout; // will be called when blackout is issued , 0xffff means , do not overwrite
+	uint16_t *channel_defaults_identify; // will be called when identify is issued , 0xffff means , do not overwrite
+	uint16_t *channel_defaults_fullbright; // will be called when fullbright is issued , 0xffff means , do not overwrite
+	char **channel_names;
 
 } device_class_t
 
@@ -21,10 +24,6 @@ struct {
 	uint16_t base_address;
 	uint8_t name_length;
 	char *name;
-	uint16_t *channel_defaults_blackout; // will be called when blackout is issued , 0xffff means , do not overwrite
-	uint16_t *channel_defaults_identify; // will be called when identify is issued , 0xffff means , do not overwrite
-	uint16_t *channel_defaults_fullbright; // will be called when fullbright is issued , 0xffff means , do not overwrite
-	char **channel_names;
 
 } devices_t;
 

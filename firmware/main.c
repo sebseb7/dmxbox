@@ -73,6 +73,10 @@ void set_current_execution(void (*new_execution)(void))
 {
 	current_execution = new_execution;
 }
+void (*get_current_execution(void))(void)
+{
+	return current_execution;
+}
 
 static uint16_t leds[LCD_HEIGHT-100][LCD_WIDTH];
 static uint16_t leds_a[100][LCD_WIDTH] __attribute__((section(".ccm")));
@@ -256,11 +260,6 @@ int main(void)
 
 	usb_ready=1;
 
-	MIDI_EventPacket_t packet;
-	packet.channel = 0;
-	packet.type = CC;
-	packet.cc = 32;
-
 
 	STM32f4_Discovery_LCD_Init();
 	LCD_SetCursor(0x00, 0x00); 
@@ -272,9 +271,9 @@ int main(void)
 	TS_STATE *pstate = NULL;
 	IOE_Config();
 
-	int oldx;
-	int oldy;
-
+	//int oldx;
+	//int oldy;
+	int pressed=0;
 	while(1)
 	{
 		current_execution();
@@ -308,7 +307,7 @@ int main(void)
 			}
 		}
 		pstate = IOE_TS_GetState();
-		if(pstate->TouchDetected)
+		if((pstate->TouchDetected)&&(pressed==0))
 		{
 			int x = pstate->X-350;
 			if(x<0) x=0;
@@ -323,30 +322,16 @@ int main(void)
 			draw_number_8x6(100, 150, oldy,4,'0',0,0,0);
 			draw_number_8x6(100, 100, x,4,'0',255,255,255);
 			draw_number_8x6(100, 150, y,4,'0',255,255,255);*/
-			oldx=x;
-			oldy=y;
+			//oldx=x;
+			//oldy=y;
+			pressed=1;
+		}
+		else if(! (pstate->TouchDetected))
+		{
+			pressed=0;
 		}
 	}
 
-
-	int position = 0;
-	while (1)
-	{
-
-		delay_ms(100);
-
-		packet.cc = 32+position;
-		packet.value = 0;
-		MIDI_send(packet);
-
-		position++;
-		if(position==8) position=0;
-
-		packet.cc = 32+position;
-		packet.value = 127;
-		MIDI_send(packet);
-
-	}
 }
 
 
@@ -360,7 +345,7 @@ void MIDI_recv_cb(MIDI_EventPacket_t packet)
 		if(midi_fader[packet.cc] > 127) midi_fader[packet.cc]++;
 		fader_updated[packet.cc]=1;
 	}
-	draw_number_8x6(100, 100, packet.cc,4,'0',255,255,255);
+	//draw_number_8x6(100, 100, packet.cc,4,'0',255,255,255);
 
 	if((packet.cc > 42)&&(packet.cc < 45))
 	{

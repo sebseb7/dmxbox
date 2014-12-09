@@ -142,6 +142,10 @@ void set_current_execution(void (*new_execution)(void))
 {
 	current_execution = new_execution;
 }
+void (*get_current_execution(void))(void)
+{
+	return current_execution;
+}
 
 struct midi_button_press_t {    
 

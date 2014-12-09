@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "menu_main.h"
+#include "screen_keyboard.h"
 #include "main.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
@@ -8,9 +8,11 @@
 #include "mcugui/button.h"
 
 static uint8_t redraw = 1;
+static uint8_t redraw_text = 1;
 
+void screen_keyboard(void);
 
-static uint8_t keyboard_layout[11*4] = {
+static const uint8_t keyboard_layout[11*4] = {
 											'1','2','3','4','5','6','7','8','9','0',' ',
 											'Q','W','E','R','T','Z','U','I','O','P',' ',
 											' ','A','S','D','F','G','H','J','K','L',' ',
@@ -21,6 +23,28 @@ static uint8_t cursor_pos = 0;
 static uint8_t blink = 0;
 
 #define MAXLENGTH 30
+
+static char buffer[MAXLENGTH+1];
+static uint8_t buffer_length=0;
+
+static void (*current_execution)(void);
+
+void invoke_keyboard()
+{
+	redraw=1;
+	redraw_text=1;
+	cursor_pos=0;
+	buffer_length=0;
+	buffer[0]=0;
+	current_execution=get_current_execution();
+	set_current_execution(screen_keyboard);
+}
+
+char* get_keyboard_buffer()
+{
+	return buffer;
+}
+
 
 void screen_keyboard()
 {
@@ -77,16 +101,21 @@ void screen_keyboard()
 		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(0*(25+2)),"DEL",255,255,255);
 		draw_text_8x6(11+10+(10*(25+2))-6,6+50+45+(2*(25+2)),"RET",255,255,255);
 	}
-		
-	draw_text_8x6(70,50,"123456789012345678901234567890",255,100,100);
+	
+	if(redraw_text)
+	{
+		draw_filledRect(67,51,MAXLENGTH*6+9,11,100,0,0);
+		draw_text_8x6(70,50,buffer,255,100,100);
+		redraw_text=0;
+	}
 
 	if((blink>>3) % 2== 0)
 	{
-		draw_text_8x6(20,20,"_",0,0,0);
+		draw_text_8x6(70+cursor_pos*6,51,"_",100,0,0);
 	}
 	else
 	{
-		draw_text_8x6(20,20,"_",255,255,255);
+		draw_text_8x6(70+cursor_pos*6,51,"_",255,255,255);
 	}
 	blink++;
 
@@ -96,18 +125,146 @@ void screen_keyboard()
 	uint16_t y;
 	if(check_button_press(&x,&y)==1)
 	{
-		if(y > 41)
+		printf("%i %i\n",x,y);
+
+		char keychar = 0;
+
+		if(y > 203)
 		{
-		}
-		else
+			keychar=' ';
+
+		}else if(y < 41)
 		{
 			if(x < 40)
 			{
 				redraw=1;
-				set_current_execution(menu_main);
+				set_current_execution(current_execution);
+				buffer[0]=0;
+			}
+
+		}else if(y > 83 ){
+
+
+			uint8_t keypos = 0;
+
+			if(y > 176)
+			{
+				keypos+=33;
+			}else if(y > 150)
+			{
+				keypos+=22;
+			}else if(y > 122)
+			{
+				keypos+=11;
+			}
+
+
+			if(keypos==0)
+			{
+				if(x > 280) keychar = 127; 
+				if(x > 253) keypos++;
+				if(x > 226) keypos++;
+				if(x > 199) keypos++;
+				if(x > 172) keypos++;
+				if(x > 145) keypos++;
+				if(x > 117) keypos++;
+				if(x > 91) keypos++;
+				if(x > 64) keypos++;
+				if(x > 36) keypos++;
+			}
+			else if(keypos==11)
+			{
+				if(x > 292) keychar = 13; 
+				if(x > 265) keypos++;
+				if(x > 238) keypos++;
+				if(x > 211) keypos++;
+				if(x > 184) keypos++;
+				if(x > 157) keypos++;
+				if(x > 130) keypos++;
+				if(x > 103) keypos++;
+				if(x > 76) keypos++;
+				if(x > 49) keypos++;
+			}
+			else if(keypos==22)
+			{
+				if(x > 280) keychar = 13; 
+				if(x > 253) keypos++;
+				if(x > 226) keypos++;
+				if(x > 199) keypos++;
+				if(x > 172) keypos++;
+				if(x > 145) keypos++;
+				if(x > 117) keypos++;
+				if(x > 91) keypos++;
+				if(x > 64) keypos++;
+				keypos++;
+			}
+			else if(keypos==33)
+			{
+				if(x > 238) keychar=1;
+				if(x > 265) keychar++;
+				if(x > 211) keypos++;
+				if(x > 184) keypos++;
+				if(x > 157) keypos++;
+				if(x > 130) keypos++;
+				if(x > 103) keypos++;
+				if(x > 76) keypos++;
+				keypos++;
+			}
+			if(keychar == 0)
+				keychar = keyboard_layout[keypos];
+		}
+
+		if(keychar == 0)
+		{
+		}else if(keychar == 1)
+		{
+			if(cursor_pos>0) 
+			{
+				cursor_pos--;
+				redraw_text=1;
+			}
+		}else if(keychar == 2)
+		{
+			if(cursor_pos<buffer_length) 
+			{
+				cursor_pos++;
+				redraw_text=1;
+			}
+		}else if(keychar == 13)
+		{
+			set_current_execution(current_execution);
+		}else if(keychar == 127)
+		{
+			if((cursor_pos > 0) && (buffer_length > 0))
+			{
+				for(int i = cursor_pos;i <=  cursor_pos+(buffer_length-cursor_pos);i++)
+				{	
+					buffer[i-1]=buffer[i];
+				}
+				cursor_pos--;
+				buffer_length--;
+				redraw_text=1;
+			}
+		}else{
+			if((cursor_pos < MAXLENGTH) && (buffer_length < MAXLENGTH))
+			{
+				for(int i = cursor_pos+(buffer_length-cursor_pos);i>=cursor_pos;i--)
+				{
+					buffer[i+1]=buffer[i];
+				}
+				
+				buffer[cursor_pos]=keychar;
+				cursor_pos++;
+				buffer_length++;
+				redraw_text=1;
 			}
 		}
-		
+
+		printf("%i %c\n",keychar,keychar);
+
+
+
+
 	}
 }
 

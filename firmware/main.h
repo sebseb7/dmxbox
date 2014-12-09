@@ -27,6 +27,7 @@ void clear_buttons_midi(void);
 void clear_faders(void);
 int check_button_press_midi(uint8_t* cc,uint8_t* value);
 void set_current_execution(void (*new_execution)(void));
+void (*get_current_execution(void))(void);
 void setLedXY(uint16_t x,uint16_t y, uint8_t r,uint8_t g,uint8_t b);
 void getLedXY(uint16_t x, uint16_t y, uint8_t* r,uint8_t* g, uint8_t* b);
 uint8_t MIDI_get_fader(uint8_t ch);

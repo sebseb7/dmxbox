@@ -3,7 +3,8 @@
 
 
 
-void screen_keyboard(void);
+void invoke_keyboard(void);
+char* get_keyboard_buffer(void);
 
 #endif
 

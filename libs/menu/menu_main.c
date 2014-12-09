@@ -78,7 +78,7 @@ void menu_main()
 		else if(field == 8)
 		{
 			redraw=1;
-			invoke_keyboard();
+			invoke_numeric_keyboard("test",0);
 		}
 	}
 

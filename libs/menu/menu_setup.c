@@ -30,7 +30,7 @@ void menu_setup()
 		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "SETUP", 200,200,255);
 
 
-		draw_button_icon(11,45,92,1,"D. Classes",155,0,0,0,255,0);
+		draw_button_icon(11,45,92,1,"Models",155,0,0,0,255,0);
 		draw_button_icon(114,45,92,1,"Devices",155,0,0,0,255,0);
 		draw_button_icon(217,45,92,1,"Scenes",155,0,0,0,255,0);
 		draw_button_icon(11,110,92,1,"Loops",155,0,0,0,255,0);

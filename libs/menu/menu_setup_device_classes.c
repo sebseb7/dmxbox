@@ -24,9 +24,9 @@ void menu_setup_device_classes()
 		draw_filledCircle(17,17,15,40,80,40);
 		draw_text_8x6(7,10,"Back",255,100,100);
 
-		uint16_t text_width =  get_text_width_16pt("Setup Device Classes");
+		uint16_t text_width =  get_text_width_16pt("Setup Device Models");
 
-		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "Setup Device Classes", 200,200,255);
+		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "Setup Device Models", 200,200,255);
 
 
 		draw_button_icon(217,45,92,1,"^",155,0,0,0,255,0);

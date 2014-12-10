@@ -10,8 +10,8 @@
 #include "usbh_core.h"
 #include "usbh_usr.h"
 #include "usbh_midi_core.h"
-#include "set_pixel_hal.h"
-#include "menu_Callback.h"
+#include "dmxbox_hal.h"
+#include "pixel_hal.h"
 
 
 #include "stm32f4xx.h"

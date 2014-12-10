@@ -2,7 +2,7 @@
 #include "menu_directdmx.h"
 #include "menu_directdmx_help.h"
 #include "menu_main.h"
-#include "menu_callback.h"
+#include "dmxbox_hal.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
 #include "mcugui/circle.h"

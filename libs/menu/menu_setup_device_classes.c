@@ -2,7 +2,7 @@
 #include "menu_setup.h"
 #include "menu_setup_device_classes.h"
 #include "menu_setup_device_classes_add.h"
-#include "menu_callback.h"
+#include "dmxbox_hal.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
 #include "mcugui/circle.h"

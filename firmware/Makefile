@@ -13,19 +13,14 @@ CORTEXM=4
 endif
 
 
-SRC=$(wildcard  *.c usb/*.c midi/*.c libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c) \
-	core/startup_stm32f4xx.c \
-	core/stm32fxxx_it.c \
-	core/syscalls.c \
-	core/system_stm32f$(STM32F)xx.c \
-	lcd_a/stm32f4_discovery_lcd.c \
-	lcd_a/STMPE811QTR.c
+ASRC=$(wildcard core/*.s)
+SRC=$(wildcard  libs/*.c libs/menu/*.c libs/mcugui/*.c lcd_a/*.c core/*.c *.c usb/*.c midi/*.c)
 
-#ASRC=core/startup_stm32f$(STM32F)xx.s
-OBJECTS= $(SRC:.c=.o)
-#$(ASRC:.s=.o)
-LSTFILES= $(SRC:.c=.lst)
-HEADERS=$(wildcard usb/*.h core/*.h *.h midi/*.h libs/*.h)
+OBJECTS=$(patsubst %,.bin/%,$(SRC:.c=.o)) $(patsubst %,.bin/%,$(ASRC:.s=.o)) 
+LSTFILES=$(patsubst %,.bin/%,$(SRC:.c=.lst)) 
+DEPS   =$(patsubst %,.bin/%,$(SRC:.c=.d)) 
+
+
 
 #  Compiler Options
 GCFLAGS = -DSTM32F=$(STM32F) -ffreestanding -std=gnu99 -mcpu=cortex-m$(CORTEXM) -mthumb $(OPTIMIZATION) -I. -Imidi -Icore -Iusb -I.. -I../libs -DARM_MATH_CM$(CORTEXM) -DSTM32F40_41xxx -D__FPU_USED=1 -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=8000000 -DSTM32F407VG -flto
@@ -37,7 +32,7 @@ GCFLAGS += -Wstrict-prototypes -Wundef -Wall -Wextra -Wunreachable-code -Wno-str
 # Optimizazions
 GCFLAGS += -fstrict-aliasing -fsingle-precision-constant -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fno-builtin -ffunction-sections -fno-common -fdata-sections 
 # Debug stuff
-GCFLAGS += -Wa,-adhlns=$(<:.c=.lst),-gstabs -g 
+GCFLAGS += -Wa,-adhlns=.bin/$(<:.c=.lst),-gstabs -g 
 
 GCFLAGS+= -ISTM32F$(STM32F)_drivers/inc
 
@@ -59,25 +54,27 @@ SIZE = arm-none-eabi-size
 
 #########################################################################
 
-all: STM32F$(STM32F)_drivers/build/libSTM32F$(STM32F)_drivers.a $(PROJECT).bin Makefile 
-	@$(SIZE) $(PROJECT).elf
+all: .bin/$(PROJECT).bin Makefile 
+	@$(SIZE) .bin/$(PROJECT).elf
 
 STM32F$(STM32F)_drivers/build/libSTM32F$(STM32F)_drivers.a:
 	@make -C STM32F$(STM32F)_drivers/build
 
-$(PROJECT).bin: $(PROJECT).elf Makefile
+.bin/$(PROJECT).bin: .bin/$(PROJECT).elf Makefile
 	@echo "generating $(PROJECT).bin"
-	@$(OBJCOPY) -R .stack -O binary $(PROJECT).elf $(PROJECT).bin
+	@$(OBJCOPY) --strip-unneeded -S -g -R .stack -O binary .bin/$(PROJECT).elf .bin/$(PROJECT).bin
 
-$(PROJECT).elf: $(OBJECTS) Makefile $(LSCRIPT)
+.bin/$(PROJECT).elf: $(OBJECTS) STM32F$(STM32F)_drivers/build/libSTM32F$(STM32F)_drivers.a Makefile $(LSCRIPT)
 	@echo "  LD $(PROJECT).elf"
-	@$(GCC) $(OBJECTS) $(LDFLAGS)  -o $(PROJECT).elf
+	@$(GCC) $(OBJECTS) $(LDFLAGS)  -o .bin/$(PROJECT).elf
 
 clean:
+	$(REMOVE) $(DEPS)
 	$(REMOVE) $(OBJECTS)
 	$(REMOVE) $(LSTFILES)
-	$(REMOVE) $(PROJECT).bin
-	$(REMOVE) $(PROJECT).elf
+	$(REMOVE) .bin/$(PROJECT).bin
+	$(REMOVE) .bin/$(PROJECT).elf
+	$(REMOVE) -r .bin
 #	make -C STM32F$(STM32F)_drivers/build clean
 
 tools/flash/st-flash:
@@ -85,11 +82,19 @@ tools/flash/st-flash:
 
 #########################################################################
 
-%.o: %.c Makefile $(HEADERS)
-	@echo "  GCC $<"
-	@$(GCC) $(GCFLAGS) -o $@ -c $<
+-include $(DEPS)
 
-%.o: %.s Makefile 
+.bin/%.o: %.c Makefile
+	@echo "  GCC $<"
+	@mkdir -p $(dir $@)
+	@$(GCC) $(GCFLAGS) -o $@ -c $<
+	@$(GCC) $(GCFLAGS) -MM $< > $*.d.tmp
+	@sed -e 's|.*:|.bin/$*.o:|' < $*.d.tmp > .bin/$*.d
+	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | \
+		sed -e 's/^ *//' -e 's/$$/:/' >> .bin/$*.d
+	@rm -f $*.d.tmp
+
+.bin/%.o: %.s Makefile 
 	@echo "  AS $<"
 	@$(AS) $(ASFLAGS) -o $@  $< 
 

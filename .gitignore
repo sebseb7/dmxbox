@@ -1,8 +1,9 @@
-*.a
-*.o
-*.bin
-*.elf
-*.lst
+firmware/.bin
 firmware/tools/flash/st-flash
 sim/sim
+firmware/tools/*.a
+firmware/tools/*.o
+firmware/tools/flash/*.o
+firmware/STM32F4_drivers/build/libSTM32F4xx_drivers.a
+firmware/STM32F4_drivers/build/.bin
 !firmware/audio/libPDMFilter_GCC.a

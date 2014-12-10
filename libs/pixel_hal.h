@@ -11,4 +11,5 @@
 
 void setLedXY(uint16_t x,uint16_t y, uint8_t r,uint8_t g,uint8_t b);
 void getLedXY(uint16_t x, uint16_t y, uint8_t* r,uint8_t* g, uint8_t* b);
+void invLedXY(uint16_t x, uint16_t y);
 #endif

@@ -109,7 +109,7 @@ int check_button_press(uint16_t* x,uint16_t* y)
 {
 	if(last != NULL)
 	{
-		printf("receive %i %i\n",last->x,last->y);
+		//printf("receive %i %i\n",last->x,last->y);
 		*x = last->x;
 		*y = last->y;
 		remove_last();
@@ -119,13 +119,13 @@ int check_button_press(uint16_t* x,uint16_t* y)
 }
 void clear_buttons()
 {
-	printf("clear ");
+	//printf("clear ");
 	while(last!=NULL)
 	{
-		printf(".");
+		//printf(".");
 		remove_last();
 	}
-	printf("\n");
+	//printf("\n");
 }
 
 	
@@ -275,7 +275,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 								uint16_t y;
 								if(check_button_press(&x,&y)==1)
 								{
-									printf("got %i %i\n",x,y);
+									//printf("got %i %i\n",x,y);
 								}
 							}
 							break;
@@ -288,7 +288,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 				case SDL_MOUSEBUTTONDOWN:
 					if (ev.button.button == SDL_BUTTON_LEFT)
 					{
-						printf("asda %i %i\n",ev.button.x>>1,ev.button.y>>1);
+						//printf("asda %i %i\n",ev.button.x>>1,ev.button.y>>1);
 						add_button_press(ev.button.x>>1,ev.button.y>>1);
 					}
 					break;

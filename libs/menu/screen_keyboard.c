@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
 
 #include "screen_keyboard.h"
 #include "dmxbox_hal.h"
@@ -32,6 +34,8 @@ static uint8_t buffer_length=0;
 
 static void (*current_execution)(void);
 
+static char* current_title;
+
 void invoke_keyboard(char* desc, char* initial)
 {
 	redraw=1;
@@ -41,17 +45,19 @@ void invoke_keyboard(char* desc, char* initial)
 	cursor_pos=buffer_length;
 	current_execution=get_current_execution();
 	set_current_execution(screen_keyboard);
+	current_title=desc;
 }
 
 void invoke_numeric_keyboard(char* desc, uint32_t initial)
 {
 	redraw=1;
 	redraw_text=1;
-	snprintf(buffer,30,"%i",initial);
+	snprintf(buffer,30,"%"PRIu32"",(unsigned int)initial);
 	buffer_length=strlen(buffer);
 	cursor_pos=buffer_length;
 	current_execution=get_current_execution();
 	set_current_execution(screen_keyboard_numeric);
+	current_title=desc;
 }
 
 char* get_keyboard_buffer()
@@ -78,9 +84,9 @@ void screen_keyboard()
 		draw_filledCircle(17,17,15,40,80,40);
 		draw_text_8x6(7,10,"Back",255,100,100);
 
-		uint16_t text_width =  get_text_width_16pt("enter blah");
+		uint16_t text_width =  get_text_width_16pt(current_title);
 
-		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "enter blah", 200,200,255);
+		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, current_title, 200,200,255);
 
 		
 		for(int row=0;row<4;row++)
@@ -301,9 +307,9 @@ void screen_keyboard_numeric()
 		draw_filledCircle(17,17,15,40,80,40);
 		draw_text_8x6(7,10,"Back",255,100,100);
 
-		uint16_t text_width =  get_text_width_16pt("enter blah");
+		uint16_t text_width =  get_text_width_16pt(current_title);
 
-		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "enter blah", 200,200,255);
+		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, current_title, 200,200,255);
 
 		
 		for(int row=0;row<4;row++)

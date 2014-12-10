@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+void *xmalloc (size_t nSize);
+void  xfree (void *pMem);
+
 #include "dmxbox_hal.h"
 #include "pixel_hal.h"
 

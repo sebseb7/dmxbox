@@ -15,6 +15,58 @@
 
 #include "keyboard.h"
 
+#include <dlfcn.h>
+
+#define MAX_HEAP_SIZE 114688 //112k
+static size_t gnCurrentMemory = 0;
+static size_t gnPeakMemory    = 0;
+void *(*libc_malloc)(size_t);
+void (*libc_free)(void*);
+
+void *xmalloc (size_t nSize)
+{
+	void *pMem = libc_malloc(nSize + sizeof(size_t));
+
+	if(gnCurrentMemory+nSize > MAX_HEAP_SIZE)
+	{
+		printf("out of memory (%lu)\n",(long int)nSize);
+		return NULL;
+	}
+
+
+	if (pMem)
+	{
+		size_t *pSize = (size_t *)pMem;
+		memcpy(pSize, &nSize, sizeof(nSize));
+		gnCurrentMemory += nSize;
+		if (gnCurrentMemory > gnPeakMemory)
+		{
+			gnPeakMemory = gnCurrentMemory;
+		}
+
+		printf("malloc - Size (%lu), Current (%lu), Peak (%lu)\n", (long unsigned int)nSize, (long unsigned int)gnCurrentMemory, (long unsigned int)gnPeakMemory);
+		return(pSize + 1);
+	}
+	return NULL;
+}
+
+void  xfree (void *pMem)
+{
+	if(pMem)
+	{
+		size_t *pSize = (size_t *)pMem;
+		--pSize;
+
+		assert(gnCurrentMemory >= *pSize);
+
+		gnCurrentMemory -= *pSize;
+		
+		printf("free - Size (%lu), Current (%lu), Peak (%lu)\n",  (long unsigned int)*pSize, (long unsigned int)gnCurrentMemory, (long unsigned int)gnPeakMemory);
+
+		libc_free(pSize);
+	}
+}
+
 static uint8_t leds[LCD_HEIGHT][LCD_WIDTH][4];
 
 void clearDisplay()
@@ -71,7 +123,7 @@ static void add_button_press(uint16_t x,uint16_t y)
 
 	struct button_press_t *p;
 
-	p = (struct button_press_t *)malloc(sizeof(struct button_press_t));
+	p = (struct button_press_t*)libc_malloc(sizeof(struct button_press_t));
 
 	p->x = x;
 	p->y = y;
@@ -93,14 +145,14 @@ static void remove_last()
 {
 	if(last == current)
 	{
-		free(last);
+		libc_free(last);
 		current=NULL;
 		last=NULL;
 	}
 	else
 	{
 		struct button_press_t *p = last->last;
-		free(last);
+		libc_free(last);
 		last=p;
 		last->next=NULL;
 	}
@@ -163,7 +215,7 @@ static void add_midi_button_press(uint8_t cc,uint8_t value)
 
 	struct midi_button_press_t *p;
 
-	p = (struct midi_button_press_t *)malloc(sizeof(struct midi_button_press_t));
+	p = (struct midi_button_press_t*)libc_malloc(sizeof(struct midi_button_press_t));
 
 	p->cc = cc;
 	p->value = value;
@@ -185,14 +237,14 @@ static void remove_last_midi(void)
 {
 	if(last_midi == current_midi)
 	{
-		free(last_midi);
+		libc_free(last_midi);
 		current_midi=NULL;
 		last_midi=NULL;
 	}
 	else
 	{
 		struct midi_button_press_t *p = last_midi->last;
-		free(last_midi);
+		libc_free(last_midi);
 		last_midi=p;
 		last_midi->next=NULL;
 	}
@@ -245,6 +297,9 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 	srand((unsigned int)time(NULL));
 
 	SDL_Surface* screen;
+
+	libc_malloc = dlsym(RTLD_NEXT, "malloc");
+	libc_free = dlsym(RTLD_NEXT, "free");
 
 
 	screen = SDL_SetVideoMode(LCD_WIDTH*2,LCD_HEIGHT*2,32, SDL_SWSURFACE | SDL_DOUBLEBUF);

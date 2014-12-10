@@ -1,7 +1,7 @@
 #ifndef _SCREEN_KEYBOARD_H
 #define _SCREEN_KEYBOARD_H
 
-#include "main.h"
+#include <stdint.h>
 
 void invoke_keyboard(char*,char*);
 char* get_keyboard_buffer(void);

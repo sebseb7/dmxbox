@@ -172,11 +172,6 @@ typedef struct
 #define LCD_DIR_HORIZONTAL       0x0000
 #define LCD_DIR_VERTICAL         0x0001
 
-/** 
-  * @brief  LCD Size (Width and Height)  
-  */ 
-#define LCD_PIXEL_WIDTH          320
-#define LCD_PIXEL_HEIGHT         240
 
 /**
   * @}

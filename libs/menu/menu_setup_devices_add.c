@@ -1,7 +1,7 @@
 
 #include "menu_setup_devices.h"
 #include "menu_setup_devices_add.h"
-#include "main.h"
+#include "menu_callback.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
 #include "mcugui/circle.h"

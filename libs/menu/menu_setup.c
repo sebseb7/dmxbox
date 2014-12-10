@@ -3,7 +3,7 @@
 #include "menu_setup_devices.h"
 #include "menu_setup_device_classes.h"
 #include "menu_main.h"
-#include "main.h"
+#include "menu_callback.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
 #include "mcugui/circle.h"

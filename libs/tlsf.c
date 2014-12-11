@@ -85,10 +85,10 @@
 
 /* Some IMPORTANT TLSF parameters */
 /* Unlike the preview TLSF versions, now they are statics */
-#define BLOCK_ALIGN (sizeof(void *) * 1)
+#define BLOCK_ALIGN (sizeof(void *) * 1) // was * 2
 
-#define MAX_FLI		(25)
-#define MAX_LOG2_SLI	(4)
+#define MAX_FLI		(25) // was 30
+#define MAX_LOG2_SLI	(4) // was 5
 #define MAX_SLI		(1 << MAX_LOG2_SLI)     /* MAX_SLI = 2^MAX_LOG2_SLI */
 
 #define FLI_OFFSET	(6)     /* tlsf structure just will manage blocks bigger */

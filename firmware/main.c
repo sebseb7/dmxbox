@@ -35,6 +35,29 @@
 #include "menu/menu_setup.h"
 #include "lcd_a/stmpe811qtr.h"
 
+#include "tlsf.h"
+#include "my_malloc.h"
+
+#define POOL_SIZE 1024 * 29
+char pool[POOL_SIZE];
+
+uint8_t pool_init=0;
+void *my_malloc(size_t size)
+{
+	if(pool_init==0)
+	{
+		pool_init=1;
+		//printf("init\n");
+		init_memory_pool(POOL_SIZE, pool);
+	}
+	//printf("malloc %i %i %i\n",(uint32_t)size,get_used_size(pool),get_max_size(pool));
+	return malloc_ex(size, pool);
+}
+void my_free(void *ptr)
+{
+	free_ex(ptr, pool);
+}
+
 /*---------------------------------------------------------------------------*/
 
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE		USB_OTG_Core_dev __ALIGN_END  ;
@@ -155,7 +178,7 @@ static void add_button_press(uint16_t x,uint16_t y)
 
 	struct button_press_t *p;
 
-	p = (struct button_press_t *)malloc(sizeof(struct button_press_t));
+	p = (struct button_press_t *)my_malloc(sizeof(struct button_press_t));
 
 	p->x = x;
 	p->y = y;
@@ -177,14 +200,14 @@ static void remove_last(void)
 {
 	if(last == current)
 	{
-		free(last);
+		my_free(last);
 		current=NULL;
 		last=NULL;
 	}
 	else
 	{
 		struct button_press_t *p = last->last;
-		free(last);
+		my_free(last);
 		last=p;
 		last->next=NULL;
 	}
@@ -206,7 +229,7 @@ static void add_midi_button_press(uint8_t cc,uint8_t value)
 
 	struct midi_button_press_t *p;
 
-	p = (struct midi_button_press_t *)malloc(sizeof(struct midi_button_press_t));
+	p = (struct midi_button_press_t *)my_malloc(sizeof(struct midi_button_press_t));
 
 	p->cc = cc;
 	p->value = value;
@@ -228,23 +251,23 @@ static void remove_last_midi(void)
 {
 	if(last_midi == current_midi)
 	{
-		free(last_midi);
+		my_free(last_midi);
 		current_midi=NULL;
 		last_midi=NULL;
 	}
 	else
 	{
 		struct midi_button_press_t *p = last_midi->last;
-		free(last_midi);
+		my_free(last_midi);
 		last_midi=p;
 		last_midi->next=NULL;
 	}
 }
-
 int main(void)
 {
 	RCC_ClocksTypeDef RCC_Clocks;
 
+//	init_heap();
 
 
 	RCC_GetClocksFreq(&RCC_Clocks);
@@ -277,6 +300,9 @@ int main(void)
 	while(1)
 	{
 		current_execution();
+		
+		draw_filledRect(180,20,100,10,60,60,60);
+		draw_number_8x6(180, 20,get_used_size(pool),10,'0',255,255,255);
 		
 		for(int y = 0; y < LCD_PIXEL_HEIGHT; y++) 
 		{
@@ -322,6 +348,7 @@ int main(void)
 			draw_number_8x6(100, 150, oldy,4,'0',0,0,0);
 			draw_number_8x6(100, 100, x,4,'0',255,255,255);
 			draw_number_8x6(100, 150, y,4,'0',255,255,255);*/
+
 			//oldx=x;
 			//oldy=y;
 			pressed=1;

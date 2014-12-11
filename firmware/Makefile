@@ -14,7 +14,7 @@ endif
 
 
 ASRC=$(wildcard core/*.s)
-SRC=$(wildcard  libs/*.c libs/menu/*.c libs/mcugui/*.c lcd_a/*.c core/*.c *.c usb/*.c midi/*.c)
+SRC=$(wildcard  libs/*.c libs/menu/*.c libs/mcugui/*.c lcd_a/*.c core/*.c *.c usb/*.c midi/*.c STM32F4_drivers/src/*.c)
 
 OBJECTS=$(patsubst %,.bin/%,$(SRC:.c=.o)) $(patsubst %,.bin/%,$(ASRC:.s=.o)) 
 LSTFILES=$(patsubst %,.bin/%,$(SRC:.c=.lst)) 
@@ -42,7 +42,8 @@ ifeq ($(CORTEXM),4)
 LDFLAGS+= -mfpu=fpv4-sp-d16 -mfloat-abi=hard -falign-functions=16
 endif
 #LDFLAGS+= -LSTM32F$(STM32F)_drivers/build -lSTM32F$(STM32F)xx_drivers -lm -lnosys -lc --specs=nano.specs -Wl,--gc-section 
-LDFLAGS+= -LSTM32F$(STM32F)_drivers/build -lSTM32F$(STM32F)xx_drivers -lm -Wl,--gc-section 
+#LDFLAGS+= -LSTM32F$(STM32F)_drivers/build -lSTM32F$(STM32F)xx_drivers 
+LDFLAGS+= -lm -Wl,--gc-section 
 
 
 #  Compiler/Assembler Paths
@@ -80,6 +81,9 @@ clean:
 tools/flash/st-flash:
 	make -C tools
 
+tools/gdbserver/st-util:
+	make -C tools
+
 #########################################################################
 
 -include $(DEPS)
@@ -102,6 +106,10 @@ tools/flash/st-flash:
 
 flash: tools/flash/st-flash all
 
-	tools/flash/st-flash --reset write $(PROJECT).bin 0x08000000 
+	tools/flash/st-flash --reset write .bin/$(PROJECT).bin 0x08000000 
 
-.PHONY : clean all flash
+debug: tools/gdbserver/st-util
+
+	arm-none-eabi-gdb .bin/$(PROJECT).elf -ex 'shell tools/gdbserver/st-util &'  -ex 'tar ext :4242'
+
+.PHONY : clean all flash debug

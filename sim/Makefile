@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 COMPILER = gcc
 
 
-FLAGS= -Dmalloc=xmalloc -Dfree=xfree -DSIMULATOR -I. -I.. -I../libs -Ilibs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto -lportmidi 
+FLAGS= -DUSE_DL_PREFIX -Dmalloc=xmalloc -Dfree=xfree -DSIMULATOR -I. -I.. -I../libs -Ilibs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto -lportmidi 
 
 #-fsingle-precision-constant
 LDFLAGS=

@@ -1,12 +1,9 @@
-#ifndef _DMX_DEVICE_CLASS_H
-#define _DMX_DEVICE_CLASS_H
+#include "dmx_device_class.h"
 
 
-// contains all devices like led-par's , fog-machines , ...
-#include <stdint.h>
 
-
-typedef struct __attribute__((__packed__)) {
+/*
+typedef struct {
 
 	uint8_t name_length;
 	char* name;
@@ -19,11 +16,24 @@ typedef struct __attribute__((__packed__)) {
 	char **channel_names;
 
 } dmx_device_class_t;
+*/
 
 
-void add_device_class(dmx_device_class_t*);
-uint16_t get_device_class_count(void);
-dmx_device_class_t* get_device_class(uint16_t idx);
+static uint16_t number_of_devices=0;
+static dmx_device_class_t* devices_classes[10];
 
+void add_device_class(dmx_device_class_t* new_device)
+{
+	devices_classes[number_of_devices]=new_device;
+	number_of_devices++;
+}
 
-#endif
+uint16_t get_device_class_count()
+{
+	return number_of_devices;
+}
+dmx_device_class_t* get_device_class(uint16_t idx)
+{
+	return devices_classes[idx];
+}
+

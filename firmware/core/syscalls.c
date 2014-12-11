@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <sys/unistd.h>
 
-caddr_t _sbrk(int incr) {
+caddr_t my_sbrk(int incr) {
 
 	extern char _ebss; // Defined by the linker
 	static char *heap_end;

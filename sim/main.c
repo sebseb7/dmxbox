@@ -15,14 +15,90 @@
 
 #include "keyboard.h"
 
-#include <dlfcn.h>
 
+
+
+#include "tlsf.h"
+#include "my_malloc.h"
+
+#define POOL_SIZE 1024 * 29
+char pool[POOL_SIZE];
+
+uint8_t pool_init=0;
+void *my_malloc(size_t size)
+{
+	if(pool_init==0)
+	{
+		pool_init=1;
+		printf("init\n");
+		init_memory_pool(POOL_SIZE, pool);
+	}
+	printf("malloc %i %i %i\n",(uint32_t)size,(uint32_t)get_used_size(pool),(uint32_t)get_max_size(pool));
+//	print_all_blocks(pool);
+//	print_tlsf(pool);
+//	dump_memory_region(pool,POOL_SIZE);
+	return malloc_ex(size, pool);
+}
+void my_free(void *ptr)
+{
+	free_ex(ptr, pool);
+}
+
+
+/*
+#include <dlfcn.h>
 #define MAX_HEAP_SIZE 114688 //112k
-static size_t gnCurrentMemory = 0;
-static size_t gnPeakMemory    = 0;
 void *(*libc_malloc)(size_t);
 void (*libc_free)(void*);
+static size_t gnCurrentMemory = 0;
+static size_t gnPeakMemory    = 0;
+void *MemAlloc (size_t nSize)
+{
+	void *pMem = malloc(sizeof(size_t) + nSize);
 
+	if (pMem)
+	{
+		size_t *pSize = (size_t *)pMem;
+
+		memcpy(pSize, &nSize, sizeof(nSize));
+
+		gnCurrentMemory += nSize;
+
+		if (gnCurrentMemory > gnPeakMemory)
+		{
+			gnPeakMemory = gnCurrentMemory;
+		}
+
+		printf("PMemAlloc (%#X) - Size (%d), Current (%d), Peak (%d)\n",
+				pSize + 1, nSize, gnCurrentMemory, gnPeakMemory);
+
+		return(pSize + 1);
+	}
+
+	return NULL;
+}
+
+void  MemFree (void *pMem)
+{
+	if(pMem)
+	{
+		size_t *pSize = (size_t *)pMem;
+
+		// Get the size
+		--pSize;
+
+		assert(gnCurrentMemory >= *pSize);
+
+		printf("PMemFree (%#X) - Size (%d), Current (%d), Peak (%d)\n",
+				pMem,  *pSize, gnCurrentMemory, gnPeakMemory);
+
+		gnCurrentMemory -= *pSize;
+
+		free(pSize);
+	}
+}
+*/
+/*
 void *xmalloc (size_t nSize)
 {
 	void *pMem = libc_malloc(nSize + sizeof(size_t));
@@ -60,13 +136,13 @@ void  xfree (void *pMem)
 		assert(gnCurrentMemory >= *pSize);
 
 		gnCurrentMemory -= *pSize;
-		
+
 		printf("free - Size (%lu), Current (%lu), Peak (%lu)\n",  (long unsigned int)*pSize, (long unsigned int)gnCurrentMemory, (long unsigned int)gnPeakMemory);
 
 		libc_free(pSize);
 	}
 }
-
+*/
 static uint8_t leds[LCD_HEIGHT][LCD_WIDTH][4];
 
 void clearDisplay()
@@ -111,7 +187,7 @@ struct button_press_t {
 
 	uint16_t x;
 	uint16_t y;
-	
+
 	struct button_press_t *next;
 	struct button_press_t *last;
 };
@@ -123,7 +199,7 @@ static void add_button_press(uint16_t x,uint16_t y)
 
 	struct button_press_t *p;
 
-	p = (struct button_press_t*)libc_malloc(sizeof(struct button_press_t));
+	p = (struct button_press_t*)my_malloc(sizeof(struct button_press_t));
 
 	p->x = x;
 	p->y = y;
@@ -145,14 +221,14 @@ static void remove_last()
 {
 	if(last == current)
 	{
-		libc_free(last);
+		my_free(last);
 		current=NULL;
 		last=NULL;
 	}
 	else
 	{
 		struct button_press_t *p = last->last;
-		libc_free(last);
+		my_free(last);
 		last=p;
 		last->next=NULL;
 	}
@@ -161,7 +237,7 @@ int check_button_press(uint16_t* x,uint16_t* y)
 {
 	if(last != NULL)
 	{
-		//printf("receive %i %i\n",last->x,last->y);
+		printf("receive %i %i\n",last->x,last->y);
 		*x = last->x;
 		*y = last->y;
 		remove_last();
@@ -180,7 +256,7 @@ void clear_buttons()
 	//printf("\n");
 }
 
-	
+
 MidiObj midi_korg;
 
 void MIDI_send_cc(uint8_t cc,uint8_t value)
@@ -203,7 +279,7 @@ struct midi_button_press_t {
 
 	uint8_t cc;
 	uint8_t value;
-	
+
 	struct midi_button_press_t *next;
 	struct midi_button_press_t *last;
 };
@@ -215,7 +291,7 @@ static void add_midi_button_press(uint8_t cc,uint8_t value)
 
 	struct midi_button_press_t *p;
 
-	p = (struct midi_button_press_t*)libc_malloc(sizeof(struct midi_button_press_t));
+	p = (struct midi_button_press_t*)my_malloc(sizeof(struct midi_button_press_t));
 
 	p->cc = cc;
 	p->value = value;
@@ -237,14 +313,14 @@ static void remove_last_midi(void)
 {
 	if(last_midi == current_midi)
 	{
-		libc_free(last_midi);
+		my_free(last_midi);
 		current_midi=NULL;
 		last_midi=NULL;
 	}
 	else
 	{
 		struct midi_button_press_t *p = last_midi->last;
-		libc_free(last_midi);
+		my_free(last_midi);
 		last_midi=p;
 		last_midi->next=NULL;
 	}
@@ -298,8 +374,8 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 
 	SDL_Surface* screen;
 
-	libc_malloc = dlsym(RTLD_NEXT, "malloc");
-	libc_free = dlsym(RTLD_NEXT, "free");
+//	libc_malloc = dlsym(RTLD_NEXT, "malloc");
+//	libc_free = dlsym(RTLD_NEXT, "free");
 
 
 	screen = SDL_SetVideoMode(LCD_WIDTH*2,LCD_HEIGHT*2,32, SDL_SWSURFACE | SDL_DOUBLEBUF);
@@ -341,6 +417,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
+					//print_freelist();
 					if (ev.button.button == SDL_BUTTON_LEFT)
 					{
 						//printf("asda %i %i\n",ev.button.x>>1,ev.button.y>>1);
@@ -350,7 +427,7 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 				default: break;
 			}
 		}
-		
+
 		KeyboardEvent e;
 		while(keyboard_poll(&midi_korg,&e)) 
 		{

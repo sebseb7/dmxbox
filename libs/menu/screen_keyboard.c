@@ -111,7 +111,7 @@ void screen_keyboard()
 				}
 	
 				char buf[2];
-				sprintf(buf, "%c", keyboard_layout[row*11+chan]);
+				snprintf(buf,2, "%c", keyboard_layout[row*11+chan]);
 
 				draw_text_8x6(11+10+(chan*(25+2))+offset,6+50+45+(row*(25+2)),buf,255,255,255);
 
@@ -149,7 +149,7 @@ void screen_keyboard()
 	uint16_t y;
 	if(check_button_press(&x,&y)==1)
 	{
-		printf("%i %i\n",x,y);
+		//printf("%i %i\n",x,y);
 
 		char keychar = 0;
 
@@ -284,7 +284,7 @@ void screen_keyboard()
 			}
 		}
 
-		printf("%i %c\n",keychar,keychar);
+		//printf("%i %c\n",keychar,keychar);
 
 
 
@@ -333,7 +333,7 @@ void screen_keyboard_numeric()
 				}
 	
 				char buf[2];
-				sprintf(buf, "%c", keyboard_layout[row*11+chan]);
+				snprintf(buf,2, "%c", keyboard_layout[row*11+chan]);
 
 				draw_text_8x6(11+10+(chan*(25+2))+offset,6+50+45+(row*(25+2)),buf,255,255,255);
 
@@ -370,7 +370,7 @@ void screen_keyboard_numeric()
 	uint16_t y;
 	if(check_button_press(&x,&y)==1)
 	{
-		printf("%i %i\n",x,y);
+		//printf("%i %i\n",x,y);
 
 		char keychar = 0;
 
@@ -480,7 +480,7 @@ void screen_keyboard_numeric()
 			}
 		}
 
-		printf("%i %c\n",keychar,keychar);
+		//printf("%i %c\n",keychar,keychar);
 
 
 

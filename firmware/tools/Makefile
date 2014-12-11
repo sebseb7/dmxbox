@@ -18,7 +18,7 @@ CFLAGS+=-Wall -Wextra
 
 LIBRARY=libstlink.a
 
-all:  $(LIBRARY) flash 
+all:  $(LIBRARY) flash gdbserver
 
 $(LIBRARY): $(OBJS_LIB)
 	@echo "objs are $(OBJS_LIB)"
@@ -34,9 +34,13 @@ clean:
 	rm -rf $(OBJS_LIB)
 	rm -rf $(LIBRARY)
 	$(MAKE) -C flash clean
+	$(MAKE) -C gdbserver clean
 	
 flash:
 	@$(MAKE) -C flash
 
+gdbserver:
+	@$(MAKE) -C gdbserver
 
-.PHONY: clean all flash 
+
+.PHONY: clean all flash gdbserver

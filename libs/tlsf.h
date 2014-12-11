@@ -31,9 +31,4 @@ extern void free_ex(void *, void *);
 extern void *realloc_ex(void *, size_t, void *);
 extern void *calloc_ex(size_t, size_t, void *);
 
-extern void *tlsf_malloc(size_t size);
-extern void tlsf_free(void *ptr);
-extern void *tlsf_realloc(void *ptr, size_t size);
-extern void *tlsf_calloc(size_t nelem, size_t elem_size);
-
 #endif

@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 COMPILER = gcc
 
 
-FLAGS= -DUSE_DL_PREFIX -Dmalloc=xmalloc -Dfree=xfree -DSIMULATOR -I. -I.. -I../libs -Ilibs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto -lportmidi 
+FLAGS= -DSIMULATOR -I. -I.. -I../libs -Ilibs --std=gnu99 -Wall  -funsigned-char -Wundef -Wsign-compare  -Wstrict-prototypes -flto -lportmidi -lm
 
 #-fsingle-precision-constant
 LDFLAGS=
@@ -40,7 +40,7 @@ clean:
 sim: $(LIB_SOURCES) $(LIB_HEADERS) main.c main.h Makefile 
 	@echo "  \033[1;34mCompile sim \033[0m"
 	@rm -f sim
-	@$(COMPILER) -DFULL=1 $(FLAGS) $(LIB_SOURCES) $(SOURCES) main.c $(LDFLAGS) -o sim 
+	@$(COMPILER) -DFULL=1 $(SOURCES) $(LIB_SOURCES) $(FLAGS) main.c $(LDFLAGS) -o sim 
 
 .PHONY : clean all
 

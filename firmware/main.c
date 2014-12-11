@@ -38,7 +38,7 @@
 #include "tlsf.h"
 #include "my_malloc.h"
 
-#define POOL_SIZE 1024 * 29
+#define POOL_SIZE 1024 * 28
 char pool[POOL_SIZE];
 
 uint8_t pool_init=0;
@@ -301,8 +301,8 @@ int main(void)
 	{
 		current_execution();
 		
-		draw_filledRect(180,20,100,10,60,60,60);
-		draw_number_8x6(180, 20,get_used_size(pool),10,'0',255,255,255);
+		//draw_filledRect(180,20,100,10,60,60,60);
+		//draw_number_8x6(182, 19,get_used_size(pool),10,'0',255,255,255);
 		
 		for(int y = 0; y < LCD_PIXEL_HEIGHT; y++) 
 		{

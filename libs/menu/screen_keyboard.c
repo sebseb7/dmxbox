@@ -34,7 +34,7 @@ static uint8_t buffer_length=0;
 
 static void (*current_execution)(void);
 
-static char* current_title;
+static char current_title[30];
 
 void invoke_keyboard(char* desc, char* initial)
 {
@@ -45,7 +45,7 @@ void invoke_keyboard(char* desc, char* initial)
 	cursor_pos=buffer_length;
 	current_execution=get_current_execution();
 	set_current_execution(screen_keyboard);
-	current_title=desc;
+	strcpy(current_title,desc);
 }
 
 void invoke_numeric_keyboard(char* desc, uint32_t initial)
@@ -57,7 +57,7 @@ void invoke_numeric_keyboard(char* desc, uint32_t initial)
 	cursor_pos=buffer_length;
 	current_execution=get_current_execution();
 	set_current_execution(screen_keyboard_numeric);
-	current_title=desc;
+	strcpy(current_title,desc);
 }
 
 char* get_keyboard_buffer()
@@ -72,7 +72,6 @@ uint32_t get_keyboard_number()
 
 void screen_keyboard()
 {
-
 	if(redraw)
 	{
 		clearDisplay();

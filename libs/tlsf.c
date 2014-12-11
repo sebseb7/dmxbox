@@ -87,7 +87,7 @@
 /* Unlike the preview TLSF versions, now they are statics */
 #define BLOCK_ALIGN (sizeof(void *) * 1) // was * 2
 
-#define MAX_FLI		(25) // was 30
+#define MAX_FLI		(20) // was 30
 #define MAX_LOG2_SLI	(4) // was 5
 #define MAX_SLI		(1 << MAX_LOG2_SLI)     /* MAX_SLI = 2^MAX_LOG2_SLI */
 
@@ -120,7 +120,7 @@
 #define PREV_USED	(0x0)
 
 
-#define USE_PRINTF (1)
+#define USE_PRINTF (0)
 
 #ifdef USE_PRINTF
 #include <stdio.h>

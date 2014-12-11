@@ -1,7 +1,7 @@
 
 #include "menu_setup_device_classes.h"
 #include "screen_keyboard.h"
-#include "menu_setup_device_classes_add.h"
+#include "menu_setup_device_classes_edit.h"
 #include "dmxbox_hal.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
@@ -84,31 +84,20 @@ static void draw_scrollbar(void)
 	}
 }
 
-void menu_setup_device_classes_add()
+static uint8_t device_to_edit=0;
+void set_device_class_to_edit(uint8_t idx)
+{
+	device_to_edit=idx;
+
+}
+
+void menu_setup_device_classes_edit()
 {
 	if(init_device)
 	{
-		new_device_class=my_malloc(sizeof(dmx_device_class_t));
+		new_device_class=get_device_class(device_to_edit);
 		init_device=0;
-		new_device_class->name=my_malloc(1);
-		new_device_class->name[0]=0;
-		new_device_class->channels=1;
-		new_device_class->channels_allocated=PRE_ALLOCATE;
-		new_device_class->channel_defaults=my_malloc(PRE_ALLOCATE*sizeof(uint8_t));
-		new_device_class->channel_defaults_blackout=my_malloc(PRE_ALLOCATE*sizeof(int16_t));
-		new_device_class->channel_defaults_identify=my_malloc(PRE_ALLOCATE*sizeof(int16_t));
-		new_device_class->channel_defaults_fullbright=my_malloc(PRE_ALLOCATE*sizeof(int16_t));
-		new_device_class->channel_names=my_malloc(PRE_ALLOCATE*sizeof(char*));
-
-		for(int i=0;i<PRE_ALLOCATE;i++)
-		{
-			new_device_class->channel_names[i]=my_malloc(1);
-			new_device_class->channel_names[i][0]=0;
-			new_device_class->channel_defaults[i]=0;
-			new_device_class->channel_defaults_blackout[i]=-1;
-			new_device_class->channel_defaults_identify[i]=-1;
-			new_device_class->channel_defaults_fullbright[i]=-1;
-		}
+		
 		active_row = 0;
 		scroll_offset = 0;
 
@@ -163,9 +152,9 @@ void menu_setup_device_classes_add()
 		draw_filledCircle(17,17,15,40,80,40);
 		draw_text_8x6(7,10,"Back",255,100,100);
 
-		uint16_t text_width =  get_text_width_16pt("Add Device Model");
+		uint16_t text_width =  get_text_width_16pt("Edit Device Model");
 
-		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "Add Device Model", 200,200,255);
+		draw_text_16pt((LCD_WIDTH-text_width)>>1,9, "Edit Device Model", 200,200,255);
 
 		init_lineitems();
 		char buf[30];
@@ -186,7 +175,7 @@ void menu_setup_device_classes_add()
 
 		draw_button_h(257,45,52,42,"^",155,0,0,0,255,0);
 		draw_button_h(257,92,52,42,"Edit",155,0,0,0,255,0);
-		draw_button_h(257,139,52,42,"Save",155,0,0,0,255,0);
+		
 		draw_button_h(257,186,52,42,"v",155,0,0,0,255,0);
 		
 
@@ -219,17 +208,6 @@ void menu_setup_device_classes_add()
 			{
 				redraw=1;
 				init_device=1;
-				for(int i=0;i<PRE_ALLOCATE;i++)
-				{
-					my_free(new_device_class->channel_names[i]);
-				}
-				my_free(new_device_class->name);
-				my_free(new_device_class->channel_defaults);
-				my_free(new_device_class->channel_defaults_blackout);
-				my_free(new_device_class->channel_defaults_identify);
-				my_free(new_device_class->channel_defaults_fullbright);
-				my_free(new_device_class->channel_names);
-				my_free(new_device_class);
 				set_current_execution(menu_setup_device_classes);
 			}
 		}
@@ -287,14 +265,6 @@ void menu_setup_device_classes_add()
 					invoke_numeric_keyboard(strbuf,new_device_class->channel_defaults[(active_row-3)>>1]);
 				}
 			}
-		}
-		if(field == 3)
-		{
-			add_device_class(new_device_class);
-			redraw=1;
-			init_device=1;
-			set_current_execution(menu_setup_device_classes);
-
 		}
 	}
 }

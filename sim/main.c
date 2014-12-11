@@ -141,7 +141,7 @@ static void add_button_press(uint16_t x,uint16_t y)
 
 	current=p;
 }
-static void remove_last()
+static void remove_last(void)
 {
 	if(last == current)
 	{

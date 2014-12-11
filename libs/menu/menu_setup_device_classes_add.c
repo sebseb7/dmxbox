@@ -42,7 +42,7 @@ static uint8_t scroll_offset = 0;
 
 static uint8_t invoke=0;
 
-#define PRE_ALLOCATE 16
+#define PRE_ALLOCATE 8
 
 void draw_background(uint8_t drawrow,uint8_t row)
 {

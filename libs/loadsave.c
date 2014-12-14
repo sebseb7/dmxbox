@@ -1,7 +1,7 @@
 #include <stdio.h>//only for debug printf
 #include <string.h>
 #include "loadsave.h"
-#include "fileio.h"
+#include "storage/fileio.h"
 #include "dmx_device_class.h"
 #include "my_malloc.h"
 
@@ -45,8 +45,6 @@ void save_device_classes(char* name)
 			outbuffersize+=strlen(get_device_class(i)->channel_names[j]);
 		}
 	}
-
-	printf("size: %i\n",outbuffersize);
 
 	uint8_t* outbuffer=my_malloc(outbuffersize);
 	uint16_t ptr=0;

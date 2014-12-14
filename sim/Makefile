@@ -28,8 +28,8 @@ ifeq ($(UNAME), MINGW32_NT-6.1)
 	BINEXT = .exe
 endif
 
-LIB_SOURCES=$(wildcard libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c)
-LIB_HEADERS=$(wildcard libs/*.h ../libs/*.h ../libs/menu/*.h ../libs/mcugui/*.h)
+LIB_SOURCES=$(wildcard storage/*.c libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c)
+LIB_HEADERS=$(wildcard storage/*.h libs/*.h ../libs/*.h ../libs/menu/*.h ../libs/mcugui/*.h)
 
 all: sim
 

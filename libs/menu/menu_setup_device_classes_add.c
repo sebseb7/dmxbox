@@ -219,7 +219,7 @@ void menu_setup_device_classes_add()
 			{
 				redraw=1;
 				init_device=1;
-				for(int i=0;i<PRE_ALLOCATE;i++)
+				for(int i=0;i<new_device_class->channels_allocated;i++)
 				{
 					my_free(new_device_class->channel_names[i]);
 				}

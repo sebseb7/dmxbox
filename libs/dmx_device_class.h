@@ -23,6 +23,7 @@ typedef struct __attribute__((__packed__)) {
 
 void add_device_class(dmx_device_class_t*);
 void del_device_class(uint8_t idx);
+void del_all_device_classs(void);
 uint16_t get_device_class_count(void);
 dmx_device_class_t* get_device_class(uint16_t idx);
 

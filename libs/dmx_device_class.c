@@ -38,7 +38,7 @@ dmx_device_class_t* get_device_class(uint16_t idx)
 	return devices_classes[idx];
 }
 
-void del_device_class(uint8_t idx)
+static void free_device_class(uint8_t idx)
 {
 	dmx_device_class_t *device_class = devices_classes[idx];
 	for(int i=0;i<device_class->channels;i++)
@@ -52,6 +52,11 @@ void del_device_class(uint8_t idx)
 	my_free(device_class->channel_defaults_fullbright);
 	my_free(device_class->channel_names);
 	my_free(device_class);
+}
+
+void del_device_class(uint8_t idx)
+{
+	free_device_class(idx);
 
 	number_of_devices--;
 	for(int i = idx;i< number_of_devices;i++)
@@ -59,4 +64,12 @@ void del_device_class(uint8_t idx)
 		devices_classes[i]=devices_classes[i+1];
 	}
 }
+void del_all_device_classs()
+{
+	for(int j=0;j<number_of_devices;j++)
+	{
+		free_device_class(j);
+	}
+	number_of_devices=0;
+};
 

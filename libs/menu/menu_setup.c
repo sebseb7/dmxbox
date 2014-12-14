@@ -9,6 +9,8 @@
 #include "mcugui/circle.h"
 #include "mcugui/button.h"
 
+#include "loadsave.h"
+
 static uint8_t redraw = 1;
 
 void menu_setup()
@@ -36,8 +38,8 @@ void menu_setup()
 		draw_button_icon(11,110,92,1,"Loops",155,0,0,0,255,0);
 		draw_button_icon(114,110,92,1,"Playbacks",155,0,0,0,255,0);
 		draw_button_icon(217,110,92,1,"Actions",155,0,0,0,255,0);
-		draw_button_icon(11,175,92,1,"Mappings",155,0,0,0,255,0);
-		draw_button_icon(114,175,92,1,"Save/Load",155,0,0,0,255,0);
+		draw_button_icon(11,175,92,1,"Load",155,0,0,0,255,0);
+		draw_button_icon(114,175,92,1,"Save",155,0,0,0,255,0);
 		draw_button_icon(217,175,92,1,"General",155,0,0,0,255,0);
 	}
 
@@ -80,10 +82,20 @@ void menu_setup()
 			redraw=1;
 			set_current_execution(menu_setup_device_classes);
 		}
-		else if(field == 1)
+		else if(field == 2)
 		{
 			redraw=1;
 			set_current_execution(menu_setup_devices);
+		}
+		else if(field == 7)
+		{
+			redraw=1;
+			load_device_classes("defult");
+		}
+		else if(field == 8)
+		{
+			redraw=1;
+			save_device_classes("defult");
 		}
 	}
 }

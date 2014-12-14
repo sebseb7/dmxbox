@@ -14,7 +14,7 @@ endif
 
 
 ASRC=$(wildcard core/*.s)
-SRC=$(wildcard  libs/*.c libs/menu/*.c libs/mcugui/*.c lcd_a/*.c core/*.c *.c usb/*.c midi/*.c STM32F4_drivers/src/*.c)
+SRC=$(wildcard  libs/*.c libs/menu/*.c libs/mcugui/*.c storage/*.c lcd_a/*.c core/*.c *.c usb/*.c midi/*.c STM32F4_drivers/src/*.c)
 
 OBJECTS=$(patsubst %,.bin/%,$(SRC:.c=.o)) $(patsubst %,.bin/%,$(ASRC:.s=.o)) 
 LSTFILES=$(patsubst %,.bin/%,$(SRC:.c=.lst)) 

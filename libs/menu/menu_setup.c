@@ -90,12 +90,12 @@ void menu_setup()
 		else if(field == 7)
 		{
 			redraw=1;
-			load_device_classes("defult");
+			load_device_classes("default");
 		}
 		else if(field == 8)
 		{
 			redraw=1;
-			save_device_classes("defult");
+			save_device_classes("default");
 		}
 	}
 }

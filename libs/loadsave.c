@@ -103,6 +103,55 @@ void load_device_classes(char* name)
 	// why +1 ??
 	char* filename = my_malloc(sizeof(char)*(strlen(name)+strlen("device_classes_.dmx")+1));
 	snprintf(filename,strlen("device_classes_.dmx")+strlen(name)+1,"device_classes_%s.dmx",name);
+
+	uint16_t inbuffersize = get_file_size(filename);
+
+	uint8_t* inbuffer=my_malloc(inbuffersize);
+	load_buffer(filename,inbuffer,inbuffersize);
+	uint16_t ptr=0;
+
+	uint16_t count = inbuffer[ptr];ptr++;
+	
+	for(uint16_t i = 0;i < count;i++)
+	{
+		dmx_device_class_t *new_device_class=my_malloc(sizeof(dmx_device_class_t));
+		
+		new_device_class->channels=inbuffer[ptr];ptr++;
+		new_device_class->channels_allocated=new_device_class->channels;
+		
+		uint8_t namelen = inbuffer[ptr];ptr++;
+		new_device_class->name=my_malloc(namelen+1);
+		memcpy(new_device_class->name,&inbuffer[ptr],namelen);ptr+=namelen;
+		new_device_class->name[namelen]=0;
+
+		
+		new_device_class->channel_defaults=my_malloc(new_device_class->channels*sizeof(uint8_t));
+		memcpy(new_device_class->channel_defaults,&inbuffer[ptr],new_device_class->channels*sizeof(uint8_t));ptr+=new_device_class->channels*sizeof(uint8_t);
+
+		new_device_class->channel_defaults_blackout=my_malloc(new_device_class->channels*sizeof(int16_t));
+		memcpy(new_device_class->channel_defaults_blackout,&inbuffer[ptr],new_device_class->channels*sizeof(uint16_t));ptr+=new_device_class->channels*sizeof(uint16_t);
+
+		new_device_class->channel_defaults_identify=my_malloc(new_device_class->channels*sizeof(int16_t));
+		memcpy(new_device_class->channel_defaults_identify,&inbuffer[ptr],new_device_class->channels*sizeof(uint16_t));ptr+=new_device_class->channels*sizeof(uint16_t);
+
+		new_device_class->channel_defaults_fullbright=my_malloc(new_device_class->channels*sizeof(int16_t));
+		memcpy(new_device_class->channel_defaults_fullbright,&inbuffer[ptr],new_device_class->channels*sizeof(uint16_t));ptr+=new_device_class->channels*sizeof(uint16_t);
+
+		new_device_class->channel_names=my_malloc(new_device_class->channels*sizeof(char*));
+
+		for(int j=0;j<new_device_class->channels;j++)
+		{
+			uint8_t namelen2 = inbuffer[ptr];ptr++;
+			new_device_class->channel_names[j]=my_malloc(namelen2+1);
+			memcpy(new_device_class->channel_names[j],&inbuffer[ptr],namelen2);ptr+=namelen2;
+			new_device_class->channel_names[j][namelen2]=0;
+		}
+		printf("add device\n");
+		add_device_class(new_device_class);
+	}
+
+	my_free(inbuffer);
+	my_free(filename);
 }
 
 char** list_device_classes(void)

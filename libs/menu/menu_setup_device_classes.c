@@ -20,7 +20,7 @@ static uint8_t redraw = 1;
 static uint8_t active_row = 0;
 static uint8_t scroll_offset = 0;
 
-void draw_background(uint8_t drawrow,uint8_t row)
+static void draw_background(uint8_t drawrow,uint8_t row)
 {
 	if(row == active_row)
 	{

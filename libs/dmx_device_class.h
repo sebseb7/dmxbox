@@ -8,7 +8,6 @@
 
 typedef struct __attribute__((__packed__)) {
 
-	uint8_t name_length;
 	char* name;
 	uint8_t channels;
 	uint8_t channels_allocated;

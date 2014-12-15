@@ -5,15 +5,7 @@
 // contains all devices like led-par's , fog-machines , ...
 
 #include "dmx_device_class.h"
-
-struct {
-
-	device_class_t *device_class;
-	uint16_t base_address;
-	uint8_t name_length;
-	char *name;
-
-} devices_t;
+#include "dmx_device.h"
 
 
 /*

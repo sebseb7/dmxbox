@@ -146,7 +146,7 @@ void load_device_classes(char* name)
 			memcpy(new_device_class->channel_names[j],&inbuffer[ptr],namelen2);ptr+=namelen2;
 			new_device_class->channel_names[j][namelen2]=0;
 		}
-		printf("add device\n");
+		//printf("add device\n");
 		add_device_class(new_device_class);
 	}
 

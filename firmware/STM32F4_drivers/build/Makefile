@@ -19,6 +19,7 @@ stm32f4xx_fsmc.c \
 stm32f4xx_i2c.c \
 stm32f4xx_rcc.c \
 stm32f4xx_rng.c \
+stm32f4xx_sdio.c \
 stm32f4xx_spi.c \
 stm32f4xx_syscfg.c \
 stm32f4xx_tim.c 

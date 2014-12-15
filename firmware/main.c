@@ -38,7 +38,7 @@
 #include "tlsf.h"
 #include "my_malloc.h"
 
-#define POOL_SIZE 1024 * 28
+#define POOL_SIZE 1024 * 27
 char pool[POOL_SIZE];
 
 uint8_t pool_init=0;
@@ -263,6 +263,7 @@ static void remove_last_midi(void)
 		last_midi->next=NULL;
 	}
 }
+
 int main(void)
 {
 	RCC_ClocksTypeDef RCC_Clocks;
@@ -273,7 +274,6 @@ int main(void)
 	RCC_GetClocksFreq(&RCC_Clocks);
 	/* SysTick end of count event each 0.1ms */
 	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
-
 
 	USBH_Init(&USB_OTG_Core_dev,
 			USB_OTG_FS_CORE_ID,

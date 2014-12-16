@@ -41,7 +41,7 @@ dmx_device_class_t* get_device_class(uint16_t idx)
 static void free_device_class(uint8_t idx)
 {
 	dmx_device_class_t *device_class = devices_classes[idx];
-	for(int i=0;i<device_class->channels;i++)
+	for(int i=0;i<device_class->channels_allocated;i++)
 	{
 		my_free(device_class->channel_names[i]);
 	}

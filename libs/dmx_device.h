@@ -7,7 +7,8 @@
 
 typedef struct  __attribute__((__packed__)){
 
-	dmx_device_class_t *device_class;
+	uint32_t uuid;
+	uint32_t dmx_device_class_uuid;
 	uint16_t base_address;
 	char *name;
 

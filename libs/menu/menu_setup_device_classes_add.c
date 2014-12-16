@@ -92,6 +92,7 @@ void menu_setup_device_classes_add()
 		init_device=0;
 		new_device_class->name=my_malloc(1);
 		new_device_class->name[0]=0;
+		new_device_class->uuid=rand();
 		new_device_class->channels=1;
 		new_device_class->channels_allocated=PRE_ALLOCATE;
 		new_device_class->channel_defaults=my_malloc(PRE_ALLOCATE*sizeof(uint8_t));

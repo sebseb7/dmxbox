@@ -34,6 +34,7 @@ void save_device_classes(char* name)
 	for(uint16_t i = 0;i < count;i++)
 	{
 		outbuffersize+= strlen(get_device_class(i)->name);
+		outbuffersize+=sizeof(uint32_t);
 		outbuffersize+=sizeof(uint8_t)*get_device_class(i)->channels;
 		outbuffersize+=sizeof(uint16_t)*get_device_class(i)->channels;
 		outbuffersize+=sizeof(uint16_t)*get_device_class(i)->channels;
@@ -61,6 +62,9 @@ void save_device_classes(char* name)
 		
 		memcpy(&outbuffer[ptr],get_device_class(i)->name,strlen(get_device_class(i)->name));
 		ptr+=strlen(get_device_class(i)->name);
+		
+		memcpy(&outbuffer[ptr],&get_device_class(i)->uuid,sizeof(uint32_t));
+		ptr+=sizeof(uint32_t);
 
 		memcpy(&outbuffer[ptr],get_device_class(i)->channel_defaults,sizeof(uint8_t)*get_device_class(i)->channels);
 		ptr+=sizeof(uint8_t)*get_device_class(i)->channels;
@@ -133,7 +137,8 @@ void load_device_classes(char* name)
 		new_device_class->name=my_malloc(namelen+1);
 		memcpy(new_device_class->name,&inbuffer[ptr],namelen);ptr+=namelen;
 		new_device_class->name[namelen]=0;
-
+		
+		memcpy(&new_device_class->uuid,&inbuffer[ptr],sizeof(uint32_t));ptr+=sizeof(uint32_t);
 		
 		new_device_class->channel_defaults=my_malloc(new_device_class->channels*sizeof(uint8_t));
 		memcpy(new_device_class->channel_defaults,&inbuffer[ptr],new_device_class->channels*sizeof(uint8_t));ptr+=new_device_class->channels*sizeof(uint8_t);

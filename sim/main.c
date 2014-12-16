@@ -384,11 +384,6 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 	srand((unsigned int)time(NULL));
 
 	SDL_Surface* screen;
-
-//	libc_malloc = dlsym(RTLD_NEXT, "malloc");
-//	libc_free = dlsym(RTLD_NEXT, "free");
-
-
 	screen = SDL_SetVideoMode(LCD_WIDTH*2,LCD_HEIGHT*2,32, SDL_SWSURFACE | SDL_DOUBLEBUF);
 
 	int running = 1;

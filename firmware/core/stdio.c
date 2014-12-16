@@ -287,7 +287,7 @@ signed int PutHexa(
 /// \param pFormat Format string.
 /// \param ap      Argument list.
 //------------------------------------------------------------------------------
-signed int vsnprintf(char *pStr, size_t length, const char *pFormat, va_list ap)
+signed int vsnprintf2(char *pStr, size_t length, const char *pFormat, va_list ap)
 {
 	char          fill;
 	unsigned char width;

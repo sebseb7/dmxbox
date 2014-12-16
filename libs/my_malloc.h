@@ -7,6 +7,7 @@
 
 void *my_malloc (size_t nSize);
 void  my_free (void *pMem);
+void* my_realloc(void* ptr, size_t size);
 
 
 #endif

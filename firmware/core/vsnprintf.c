@@ -18,13 +18,12 @@
 /* Required to tell conf.h not to include the standard ProFTPD
  * header files
  */
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
 
 #include <ctype.h>
 
+#include <math.h>
+#include "my_malloc.h"
 
 #define DECIMAL_STRING_LENGTH 512
 
@@ -54,8 +53,9 @@ static int skip_atoi(const char **s)
 #define LEFT	16
 #define SPECIAL	32
 #define LARGE	64
-
-
+void assert(int exp __attribute__((unused)))
+{
+}
 char *sstrncpy(char *dest, const char *src, size_t n) {
 	register char *d = dest;
 
@@ -71,7 +71,81 @@ char *sstrncpy(char *dest, const char *src, size_t n) {
 
 	return dest;
 }
+static char *convert(float value, int ndigit, int *decpt, int *sign, int fflag)
+{
+	static char *buf= 0;
+	static int   bufsize= 0;
+	union { uint64_t l;  float f; } x;
+	x.f= value;
+	int	   exp2= (0x7ff & (x.l >> 52)) -1023;
+	uint64_t mant= x.l & 0x000fffffffffffffULL;
+	if ((*sign= x.l >> 63)) value= -value;
+	if (exp2 == 0x400) {
+		*decpt= 0;
+		return mant ? "nan" : "inf";
+	}
+	int exp10= (value == 0) ? !fflag : (int)ceil(log10(value));
+	if (exp10 < -307) exp10= -307;	/* otherwise overflow in pow() */
+	value *= pow(10.0, -exp10);
+	if (value) {
+		while (value <  0.1) { value *= 10;  --exp10; }
+		while (value >= 1.0) { value /= 10;  ++exp10; }
+	}									assert(value == 0 || (0.1 <= value && value < 1.0));
+	if (fflag) {
+		if (ndigit + exp10 < 0) {
+			*decpt= -ndigit;
+			return "";
+		}
+		ndigit += exp10;
+	}
+	*decpt= exp10;
+	if (bufsize < ndigit + 2) {
+		bufsize= ndigit + 2;
+		buf= buf ? my_realloc(buf, bufsize) : my_malloc(bufsize);
+	}
+	int ptr= 1;
+#if 0	/* slow and safe (and dreadfully boring) */
+	while (ptr <= ndigit) {
+		double i;
+		value= modf(value * 10, &i);
+		buf[ptr++]= '0' + (int)i;
+	}
+	if (value >= 0.5)
+		while (--ptr && ++buf[ptr] > '9')
+			buf[ptr]= '0';
+#else	/* faster */
+	x.f= value;
+	exp2= (0x7ff & (x.l >> 52)) -1023;			  		assert(value == 0 || (-4 <= exp2 && exp2 <= -1));
+	mant= x.l & 0x000fffffffffffffULL;
+	if (exp2 == -1023)
+		++exp2;
+	else
+		mant |= 0x0010000000000000ULL;
+	mant <<= (exp2 + 4);			/* 56-bit denormalised signifier */
+	while (ptr <= ndigit) {
+		mant &= 0x00ffffffffffffffULL;	/* mod 1.0 */
+		mant= (mant << 1) + (mant << 3);
+		buf[ptr++]= '0' + (mant >> 56);
+	}
+	if (mant & 0x0080000000000000ULL)	/* 1/2 << 56 */
+		while (--ptr && ++buf[ptr] > '9')
+			buf[ptr]= '0';
+#endif
+	if (ptr) {
+		buf[ndigit + 1]= 0;
+		return buf + 1;
+	}
+	if (fflag) {
+		++ndigit;
+		++*decpt;
+	}
+	buf[0]= '1';
+	buf[ndigit]= 0;
+	return buf;
+}
 
+
+char *fcvt(float value, int ndigit, int *decpt, int *sign)	{ return convert(value, ndigit, decpt, sign, 1); }
 
 static char *number(char *str, long num, int base, int size, int
 		precision, int type, size_t *max_size)
@@ -313,7 +387,7 @@ repeat:
 
 			case 'f':
 				{
-					double	dval;
+					float	dval;
 					int	ndigit, decpt, sign;
 					char	cvtbuf[DECIMAL_STRING_LENGTH] = {'\0'};
 					char	*cbp;
@@ -326,11 +400,6 @@ repeat:
 
 					dval = va_arg(args, double);
 
-					/*
-					 ** If available fconvert() is preferred, but fcvt() is
-					 ** more widely available.  It is included in 4.3BSD,
-					 ** the SUS1 and SUS2 standards, Gnu libc.
-					 */
 					cbp = fcvt(dval, ndigit, &decpt, &sign);
 					sstrncpy(cvtbuf, cbp, sizeof cvtbuf);
 					cbp = cvtbuf;

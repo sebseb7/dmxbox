@@ -56,6 +56,10 @@ void *my_malloc(size_t size)
 	//return malloc_ex(size, pool);
 	return tlsf_malloc(tlsf,size);
 }
+void* my_realloc(void* ptr, size_t size)
+{
+	return tlsf_realloc(tlsf,ptr,size);
+}
 void my_free(void *ptr)
 {
 	//free_ex(ptr, pool);

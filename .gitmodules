@@ -1,0 +1,4 @@
+[submodule "libs/mcugui"]
+	path = libs/mcugui
+	url = https://github.com/sebseb7/mcugui.git
+	branch = master

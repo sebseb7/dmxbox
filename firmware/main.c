@@ -40,6 +40,7 @@
 
 #define POOL_SIZE 1024 * 27
 char pool[POOL_SIZE];
+tlsf_t tlsf; 
 
 uint8_t pool_init=0;
 void *my_malloc(size_t size)
@@ -48,15 +49,19 @@ void *my_malloc(size_t size)
 	{
 		pool_init=1;
 		//printf("init\n");
-		init_memory_pool(POOL_SIZE, pool);
+		//init_memory_pool(POOL_SIZE, pool);
+		tlsf = tlsf_create_with_pool(pool, POOL_SIZE);
 	}
 	//printf("malloc %i %i %i\n",(uint32_t)size,get_used_size(pool),get_max_size(pool));
-	return malloc_ex(size, pool);
+	//return malloc_ex(size, pool);
+	return tlsf_malloc(tlsf,size);
 }
 void my_free(void *ptr)
 {
-	free_ex(ptr, pool);
+	//free_ex(ptr, pool);
+	tlsf_free(tlsf,ptr);
 }
+
 
 /*---------------------------------------------------------------------------*/
 

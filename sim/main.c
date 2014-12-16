@@ -25,23 +25,34 @@
 char pool[POOL_SIZE];
 
 uint8_t pool_init=0;
+tlsf_t tlsf; 
+void my_walker(void* ptr, size_t size, int used)
+{
+//	(void)user;
+	printf("\t%p %s size: %i\n", ptr, used ? "used" : "free", (unsigned int)size);
+}
 void *my_malloc(size_t size)
 {
 	if(pool_init==0)
 	{
 		pool_init=1;
 		printf("init\n");
-		init_memory_pool(POOL_SIZE, pool);
+		//init_memory_pool(POOL_SIZE, pool);
+		tlsf = tlsf_create_with_pool(pool, POOL_SIZE);
 	}
-	printf("malloc %i %i %i\n",(uint32_t)size,(uint32_t)get_used_size(pool),(uint32_t)get_max_size(pool));
+	//printf("malloc %i %i %i\n",(uint32_t)size,(uint32_t)get_used_size(pool),(uint32_t)get_max_size(pool));
+	printf("malloc %i %i %i %i %i %i\n",(uint32_t)size,(int)tlsf_size(),(int)tlsf_align_size(),(int)tlsf_block_size_min(),(int)tlsf_pool_overhead(),(int)tlsf_alloc_overhead());
+	tlsf_walk_pool(tlsf_get_pool(tlsf),my_walker);
 //	print_all_blocks(pool);
 //	print_tlsf(pool);
 //	dump_memory_region(pool,POOL_SIZE);
-	return malloc_ex(size, pool);
+	//return malloc_ex(size, pool);
+	return tlsf_malloc(tlsf,size);
 }
 void my_free(void *ptr)
 {
-	free_ex(ptr, pool);
+	tlsf_free(tlsf,ptr);
+	//free_ex(ptr, pool);
 }
 
 

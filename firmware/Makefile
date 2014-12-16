@@ -106,7 +106,12 @@ tools/gdbserver/st-util:
 
 flash: tools/flash/st-flash all
 
-	tools/flash/st-flash --reset write .bin/$(PROJECT).bin 0x08000000 
+#	tools/flash/st-flash --reset write .bin/$(PROJECT).bin 0x08000000 
+
+	dd if=.bin/$(PROJECT).bin of=.bin/$(PROJECT).bin_a bs=1 count=16384
+	dd if=.bin/$(PROJECT).bin of=.bin/$(PROJECT).bin_b bs=1 iseek=49152
+	tools/flash/st-flash --reset write .bin/$(PROJECT).bin_a 0x08000000
+	tools/flash/st-flash --reset write .bin/$(PROJECT).bin_b 0x0800c000 
 
 debug: tools/gdbserver/st-util
 

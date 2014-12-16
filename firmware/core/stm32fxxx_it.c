@@ -202,7 +202,6 @@ void OTG_HS_IRQHandler(void)
 void SysTick_Handler(void)
 {
   TimingDelay_Decrement();
-  USB_Host_Handle();
 }
 
 

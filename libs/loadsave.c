@@ -106,9 +106,19 @@ void load_device_classes(char* name)
 
 	uint16_t inbuffersize = get_file_size(filename);
 
+
+	if(inbuffersize < 2)
+	{
+		my_free(filename);
+		return;
+	}
+	
+
 	uint8_t* inbuffer=my_malloc(inbuffersize);
 	load_buffer(filename,inbuffer,inbuffersize);
 	uint16_t ptr=0;
+
+
 
 	uint16_t count = inbuffer[ptr];ptr++;
 	

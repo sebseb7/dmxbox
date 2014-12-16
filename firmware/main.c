@@ -38,7 +38,9 @@
 #include "tlsf.h"
 #include "my_malloc.h"
 
-#define POOL_SIZE 1024 * 27
+#include "storage/microsd_spi.h"
+
+#define POOL_SIZE 1024 * 26
 char pool[POOL_SIZE];
 tlsf_t tlsf; 
 
@@ -76,18 +78,32 @@ __ALIGN_BEGIN USBH_HOST					USB_Host __ALIGN_END ;
 /*====================================================================================================*/
 
 static __IO uint32_t TimingDelay;
+static __IO uint32_t ms10_count = 0;
 void delay_ms(__IO uint32_t nTime)
 {
-	TimingDelay = nTime*1;
+	TimingDelay = nTime*10;
 
 	while(TimingDelay != 0);
 }
 
 void TimingDelay_Decrement(void)
 {
+	static int usb_tick=0;
 	if (TimingDelay != 0x00)
 	{ 
 		TimingDelay--;
+	}
+	usb_tick++;
+	if(usb_tick==10)
+	{
+		USB_Host_Handle();
+		usb_tick=0;
+	}
+	ms10_count++;
+	if(ms10_count == 100)
+	{
+		ms10_count=0;
+		disk_timerproc();
 	}
 }
 
@@ -96,7 +112,7 @@ void USB_Host_Handle()
 {
 	if(usb_ready==1)
 	{
-			USBH_Process(&USB_OTG_Core_dev , &USB_Host);
+		USBH_Process(&USB_OTG_Core_dev , &USB_Host);
 	}
 }
 
@@ -273,6 +289,7 @@ static void remove_last_midi(void)
 	}
 }
 
+
 int main(void)
 {
 	RCC_ClocksTypeDef RCC_Clocks;
@@ -282,7 +299,7 @@ int main(void)
 
 	RCC_GetClocksFreq(&RCC_Clocks);
 	/* SysTick end of count event each 0.1ms */
-	SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
+	SysTick_Config(RCC_Clocks.HCLK_Frequency / 10000);
 
 	USBH_Init(&USB_OTG_Core_dev,
 			USB_OTG_FS_CORE_ID,
@@ -291,12 +308,12 @@ int main(void)
 			&USR_Callbacks);
 
 	usb_ready=1;
-
+	
 
 	STM32f4_Discovery_LCD_Init();
 	LCD_SetCursor(0x00, 0x00); 
 	LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
-
+	
 
 	current_execution = menu_main;
 
@@ -306,6 +323,7 @@ int main(void)
 	//int oldx;
 	//int oldy;
 	int pressed=0;
+	
 	while(1)
 	{
 		current_execution();

@@ -22,7 +22,7 @@ typedef struct {
 
 
 static uint16_t number_of_devices=0;
-static dmx_device_class_t* devices_classes[10];
+static dmx_device_class_t*  devices_classes[10];
 
 void add_device_class(dmx_device_class_t* new_device)
 {
@@ -37,6 +37,15 @@ uint16_t get_device_class_count()
 dmx_device_class_t* get_device_class(uint16_t idx)
 {
 	return devices_classes[idx];
+}
+dmx_device_class_t* get_device_class_by_uuid(uint32_t uuid)
+{
+	for(int i = 0;i< number_of_devices;i++)
+	{
+		if(devices_classes[i]->uuid == uuid)
+			return devices_classes[i];
+	}
+	return NULL;
 }
 
 static void free_device_class(uint8_t idx)

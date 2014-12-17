@@ -3,11 +3,13 @@
 #include "menu_setup_devices.h"
 #include "menu_setup_device_classes.h"
 #include "menu_main.h"
+#include "info_popup.h"
 #include "dmxbox_hal.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
 #include "mcugui/circle.h"
 #include "mcugui/button.h"
+#include "dmx_device_class.h"
 
 #include "loadsave.h"
 
@@ -85,7 +87,18 @@ void menu_setup()
 		else if(field == 2)
 		{
 			redraw=1;
-			set_current_execution(menu_setup_devices);
+			if(get_device_class_count()==0)
+			{
+				invoke_info_popup("Create at least one","Device Class first.","");
+			}
+			else
+			{
+				set_current_execution(menu_setup_devices);
+			}
+		}
+		else if(field == 6)
+		{
+			redraw=1;
 		}
 		else if(field == 7)
 		{

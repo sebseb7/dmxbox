@@ -32,6 +32,15 @@ dmx_device_t* get_device(uint16_t idx)
 {
 	return devices[idx];
 }
+dmx_device_t* get_device_by_uuid(uint32_t uuid)
+{
+	for(int i = 0;i< number_of_devices;i++)
+	{
+		if(devices[i]->uuid == uuid)
+			return devices[i];
+	}
+	return NULL;
+}
 
 static void free_device(uint8_t idx)
 {

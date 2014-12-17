@@ -164,7 +164,7 @@ void menu_setup_devices()
 			{
 				if(get_device_count()<10)
 				{
-					//set_current_execution(menu_setup_device_add);
+					set_current_execution(menu_setup_devices_add);
 				}
 			}
 			else

@@ -11,7 +11,8 @@
 #include "mcugui/button.h"
 #include "dmx_device_class.h"
 
-#include "loadsave.h"
+#include "loadsave_device_classes.h"
+#include "loadsave_devices.h"
 
 static uint8_t redraw = 1;
 
@@ -104,11 +105,13 @@ void menu_setup()
 		{
 			//redraw=1;
 			load_device_classes("default");
+			load_devices("default");
 		}
 		else if(field == 8)
 		{
 			//redraw=1;
 			save_device_classes("default");
+			save_devices("default");
 		}
 	}
 }

@@ -16,7 +16,7 @@ typedef struct  __attribute__((__packed__)){
 
 
 static uint16_t number_of_devices=0;
-static dmx_device_t* devices[10];
+static dmx_device_t* devices[50];
 
 void add_device(dmx_device_t* new_device)
 {

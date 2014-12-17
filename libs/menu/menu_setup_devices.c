@@ -2,6 +2,7 @@
 #include "menu_setup.h"
 #include "menu_setup_devices.h"
 #include "menu_setup_devices_add.h"
+#include "menu_setup_devices_edit.h"
 #include "dmxbox_hal.h"
 #include "mcugui/rect.h"
 #include "mcugui/text.h"
@@ -12,6 +13,7 @@
 #include "my_malloc.h"
 
 #include <stdio.h>
+#include <string.h>
 
 static uint8_t redraw = 1;
 
@@ -82,8 +84,23 @@ void menu_setup_devices()
 		draw_lineitem("","<new>");
 		for(int i = 0; i < get_device_count();i++)
 		{
-			snprintf(buf,30,"%i",i+1);
-			snprintf(buf2,30,"%s",get_device(i)->name);
+			snprintf(buf,30,"%i",get_device(i)->base_address);
+		
+			char classname[30];
+			if(get_device(i)->device_class_uuid == 0)
+			{
+				strncpy(classname,"<empty>",30);
+			}
+			else if(get_device_class_by_uuid(get_device(i)->device_class_uuid) == NULL)
+			{
+				strncpy(classname,"<missing>",30);
+			}
+			else
+			{
+				strncpy(classname,get_device_class_by_uuid(get_device(i)->device_class_uuid)->name,30);
+			}
+
+			snprintf(buf2,30,"%s - %s",classname,get_device(i)->name);
 			draw_lineitem(buf,buf2);
 		}
 
@@ -162,15 +179,15 @@ void menu_setup_devices()
 			redraw=1;
 			if(active_row==0)
 			{
-				if(get_device_count()<10)
+				if(get_device_count()<50)
 				{
 					set_current_execution(menu_setup_devices_add);
 				}
 			}
 			else
 			{
-				//set_current_execution(menu_setup_device_edit);
-				//set_device_to_edit(active_row-1);
+				set_current_execution(menu_setup_devices_edit);
+				set_device_to_edit(active_row-1);
 			}
 		}
 		if(field == 3)

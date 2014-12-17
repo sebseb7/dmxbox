@@ -2,7 +2,6 @@
 #define _DMX_LOOPS_H
 
 
-// contains all devices like led-par's , fog-machines , ...
 #include <stdint.h>
 
 
@@ -17,8 +16,9 @@ typedef struct __attribute__((__packed__)) {
 
 typedef struct __attribute__((__packed__)) {
 
-	char name[10];
+	char name[16];
 	uint16_t hold_time_ms; //65sec max
+	uint8_t morph_steps;
 	uint8_t channels;
 	uint8_t channels_allocated;
 	dmx_channelset_t *channelsets;

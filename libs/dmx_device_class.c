@@ -36,6 +36,7 @@ uint16_t get_device_class_count()
 }
 dmx_device_class_t* get_device_class(uint16_t idx)
 {
+	// handle index out-of-bounds?
 	return devices_classes[idx];
 }
 dmx_device_class_t* get_device_class_by_uuid(uint32_t uuid)
@@ -50,6 +51,7 @@ dmx_device_class_t* get_device_class_by_uuid(uint32_t uuid)
 
 static void free_device_class(uint8_t idx)
 {
+	// handle index out of bounds?
 	dmx_device_class_t *device_class = devices_classes[idx];
 	for(int i=0;i<device_class->channels_allocated;i++)
 	{
@@ -66,6 +68,7 @@ static void free_device_class(uint8_t idx)
 
 void del_device_class(uint8_t idx)
 {
+	// handle index out of bounds?
 	free_device_class(idx);
 
 	number_of_devices--;

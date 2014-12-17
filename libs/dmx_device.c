@@ -30,6 +30,7 @@ uint16_t get_device_count()
 }
 dmx_device_t* get_device(uint16_t idx)
 {
+	// handle index out of bounds?
 	return devices[idx];
 }
 dmx_device_t* get_device_by_uuid(uint32_t uuid)
@@ -44,6 +45,7 @@ dmx_device_t* get_device_by_uuid(uint32_t uuid)
 
 static void free_device(uint8_t idx)
 {
+	// handle index out of bounds?
 	dmx_device_t *device = devices[idx];
 	my_free(device->name);
 	my_free(device);
@@ -51,6 +53,7 @@ static void free_device(uint8_t idx)
 
 void del_device(uint8_t idx)
 {
+	// handle index out of bounds?
 	free_device(idx);
 
 	number_of_devices--;

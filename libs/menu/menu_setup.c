@@ -1,5 +1,6 @@
 
 #include "menu_setup.h"
+#include "menu_setup_loops.h"
 #include "menu_setup_devices.h"
 #include "menu_setup_device_classes.h"
 #include "menu_main.h"
@@ -10,6 +11,7 @@
 #include "mcugui/circle.h"
 #include "mcugui/button.h"
 #include "dmx_device_class.h"
+#include "dmx_device.h"
 
 #include "loadsave_device_classes.h"
 #include "loadsave_devices.h"
@@ -95,6 +97,18 @@ void menu_setup()
 			else
 			{
 				set_current_execution(menu_setup_devices);
+			}
+		}
+		else if(field == 4)
+		{
+			redraw=1;
+			if(get_device_count()==0)
+			{
+				invoke_info_popup("Create at least one","Device first.","");
+			}
+			else
+			{
+				set_current_execution(menu_setup_loops);
 			}
 		}
 		else if(field == 6)

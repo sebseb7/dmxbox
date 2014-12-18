@@ -21,7 +21,7 @@ typedef struct __attribute__((__packed__)) {
 	uint8_t morph_steps;
 	uint8_t channels;
 	uint8_t channels_allocated;
-	dmx_channelset_t *channelsets;
+	dmx_channelset_t **channelsets;
 
 } dmx_step_t;
 
@@ -31,7 +31,7 @@ typedef struct __attribute__((__packed__)) {
 	char* name;
 	uint8_t steps_in_use;
 	uint8_t steps_allocated;
-	dmx_step_t *steps;
+	dmx_step_t **steps;
 
 } dmx_loop_t;
 

@@ -27,6 +27,7 @@ static uint8_t init_device=1;
 static dmx_loop_t *new_loop;
 
 static uint8_t invoke=0;
+static uint8_t play=0;
 
 static uint8_t active_row = 0;
 static uint8_t scroll_offset = 0;
@@ -184,11 +185,27 @@ void menu_setup_loops_add()
 
 		draw_button_h(257,45,52,42,"^",155,0,0,0,255,0);
 		draw_button_h(257,92,52,42,"v",155,0,0,0,255,0);
-		
-		draw_button_h(10,139,71,89,"Play",155,0,0,0,255,0);
-		draw_button_h(71+5+10,139,71,42,"Insert",155,0,0,0,255,0);
-		draw_button_h(2*(71+5)+10,139,71,42,"Del",155,0,0,0,255,0);
-		draw_button_h(71+5+10,186,71,42,"Copy",155,0,0,0,255,0);
+	
+		if(play)
+			draw_button_h(10,139,71,89,"Play",0,155,0,255,0,0);
+		else
+			draw_button_h(10,139,71,89,"Play",155,0,0,0,255,0);
+
+		if(active_row != 0)
+			draw_button_h(71+5+10,139,71,42,"Insert",155,0,0,0,255,0);
+		else
+			draw_button_h(71+5+10,139,71,42,"",55,55,55,0,255,0);
+
+		if(active_row != 0)
+			draw_button_h(2*(71+5)+10,139,71,42,"Del",155,0,0,0,255,0);
+		else
+			draw_button_h(2*(71+5)+10,139,71,42,"",55,55,55,0,255,0);
+
+		if(active_row != 0)
+			draw_button_h(71+5+10,186,71,42,"Copy",155,0,0,0,255,0);
+		else
+			draw_button_h(71+5+10,186,71,42,"",55,55,55,0,255,0);
+
 		draw_button_h(2*(71+5)+10,186,71,42,"Edit",155,0,0,0,255,0);
 		draw_button_h(3*(71+5)+10,139,71,89,"Save",155,0,0,0,255,0);
 	}
@@ -202,15 +219,52 @@ void menu_setup_loops_add()
 		{
 			field=1;
 
-			if(y > 184)
+			if(y > 136)
 			{
-				field=4;
-			}else if(y > 136)
+				if(x < 85)
+				{
+					field = 1;
+				}
+				else if(x < 156)
+				{
+					if(y > 184)
+					{
+						field = 3;
+					}
+					else
+					{
+						field = 2;
+					}
+				}
+				else if(x < 234)
+				{
+					if(y > 184)
+					{
+						field = 5;
+					}
+					else
+					{
+						field = 4;
+					}
+				}
+				else
+				{
+					field = 6;
+				}
+			}
+			else 
 			{
-				field=3;
-			}else if(y > 89)
-			{
-				field=2;
+				if(x > 247)
+				{
+					if(y > 90)
+					{
+						field = 7;
+					}
+					else
+					{
+						field = 8;
+					}
+				}
 			}
 		}
 		else
@@ -236,8 +290,21 @@ void menu_setup_loops_add()
 				set_current_execution(menu_setup_loops);
 			}
 		}
-		
+		printf("field: %i\n",field);
 		if(field == 1)
+		{
+			redraw=1;
+			if(play == 1)
+			{
+				play=0;
+				printf("no play\n");
+			}else{
+				printf("play\n");
+				play=1;
+			}
+		}
+		
+		if(field == 8)
 		{
 			if(active_row > 0)
 			{
@@ -250,7 +317,7 @@ void menu_setup_loops_add()
 			}
 			redraw=1;
 		}
-		if(field == 4)
+		if(field == 7)
 		{
 			if(active_row < new_loop->steps_in_use+1)
 			{
@@ -263,7 +330,7 @@ void menu_setup_loops_add()
 			}
 			redraw=1;
 		}
-		if(field == 2)
+		if(field == 5)
 		{
 			invoke=active_row+1;
 			redraw=1;
@@ -280,7 +347,7 @@ void menu_setup_loops_add()
 				//invoke_numeric_keyboard("Enter Base Address",new_device->base_address);
 			}
 		}
-		if(field == 3)
+		if(field == 6)
 		{
 			add_loop(new_loop);
 			redraw=1;

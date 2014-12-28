@@ -84,13 +84,13 @@ static char *convert(float value, int ndigit, int *decpt, int *sign, int fflag)
 		*decpt= 0;
 		return mant ? "nan" : "inf";
 	}
-	int exp10= (value == 0) ? !fflag : (int)ceil(log10(value));
+	int exp10= (value <= 0) ? !fflag : (int)ceil(log10(value));
 	if (exp10 < -307) exp10= -307;	/* otherwise overflow in pow() */
 	value *= pow(10.0, -exp10);
-	if (value) {
+	if (value >= 0) {
 		while (value <  0.1) { value *= 10;  --exp10; }
 		while (value >= 1.0) { value /= 10;  ++exp10; }
-	}									assert(value == 0 || (0.1 <= value && value < 1.0));
+	}									assert(value <= 0 || (0.1 <= value && value < 1.0));
 	if (fflag) {
 		if (ndigit + exp10 < 0) {
 			*decpt= -ndigit;
@@ -115,7 +115,7 @@ static char *convert(float value, int ndigit, int *decpt, int *sign, int fflag)
 			buf[ptr]= '0';
 #else	/* faster */
 	x.f= value;
-	exp2= (0x7ff & (x.l >> 52)) -1023;			  		assert(value == 0 || (-4 <= exp2 && exp2 <= -1));
+	exp2= (0x7ff & (x.l >> 52)) -1023;			  		assert(value <= 0 || (-4 <= exp2 && exp2 <= -1));
 	mant= x.l & 0x000fffffffffffffULL;
 	if (exp2 == -1023)
 		++exp2;

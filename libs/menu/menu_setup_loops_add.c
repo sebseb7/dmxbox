@@ -187,27 +187,35 @@ void menu_setup_loops_add()
 		draw_button_h(257,92,52,42,"v",155,0,0,0,255,0);
 	
 		if(play)
-			draw_button_h(10,139,71,89,"Play",0,155,0,255,0,0);
+			draw_button_h(10,139,71,42,"Play",0,155,0,255,0,0);
 		else
-			draw_button_h(10,139,71,89,"Play",155,0,0,0,255,0);
+			draw_button_h(10,139,71,42,"Play",155,0,0,0,255,0);
+
+		draw_button_h(10,186,71,42,"Save",155,0,0,0,255,0);
+
 
 		if(active_row != 0)
 			draw_button_h(71+5+10,139,71,42,"Insert",155,0,0,0,255,0);
 		else
 			draw_button_h(71+5+10,139,71,42,"",55,55,55,0,255,0);
 
-		if(active_row != 0)
+		if((active_row != 0)&&(active_row != 1+new_loop->steps_in_use))
 			draw_button_h(2*(71+5)+10,139,71,42,"Del",155,0,0,0,255,0);
 		else
 			draw_button_h(2*(71+5)+10,139,71,42,"",55,55,55,0,255,0);
 
-		if(active_row != 0)
+		if((active_row != 0)&&(active_row != 1+new_loop->steps_in_use))
 			draw_button_h(71+5+10,186,71,42,"Copy",155,0,0,0,255,0);
 		else
 			draw_button_h(71+5+10,186,71,42,"",55,55,55,0,255,0);
 
-		draw_button_h(2*(71+5)+10,186,71,42,"Edit",155,0,0,0,255,0);
-		draw_button_h(3*(71+5)+10,139,71,89,"Save",155,0,0,0,255,0);
+		if(active_row != 1+new_loop->steps_in_use)
+			draw_button_h(2*(71+5)+10,186,71,42,"Edit",155,0,0,0,255,0);
+		else
+			draw_button_h(2*(71+5)+10,186,71,42,"",55,55,55,0,255,0);
+
+		draw_button_h(3*(71+5)+10,139,71,42,"Move up",155,0,0,0,255,0);
+		draw_button_h(3*(71+5)+10,186,71,42,"Move down",155,0,0,0,255,0);
 	}
 
 	uint8_t field=0;
@@ -290,16 +298,16 @@ void menu_setup_loops_add()
 				set_current_execution(menu_setup_loops);
 			}
 		}
-		printf("field: %i\n",field);
+		//printf("field: %i\n",field);
 		if(field == 1)
 		{
 			redraw=1;
 			if(play == 1)
 			{
 				play=0;
-				printf("no play\n");
+		//		printf("no play\n");
 			}else{
-				printf("play\n");
+		//		printf("play\n");
 				play=1;
 			}
 		}

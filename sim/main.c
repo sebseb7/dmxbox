@@ -16,6 +16,10 @@
 #include "keyboard.h"
 
 
+#ifdef LIBFTDI
+#include "libftdi1/ftdi.h"
+#endif
+
 
 
 #include "tlsf.h"
@@ -29,7 +33,7 @@ tlsf_t tlsf;
 void my_walker(void* ptr, size_t size, int used)
 {
 //	(void)user;
-	printf("\t%p %s size: %i\n", ptr, used ? "used" : "free", (unsigned int)size);
+//	printf("\t%p %s size: %i\n", ptr, used ? "used" : "free", (unsigned int)size);
 }
 void *my_malloc(size_t size)
 {
@@ -392,6 +396,42 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 
 	current_execution = menu_main;
 
+#ifdef LIBFTDI
+
+	int ret;
+	struct ftdi_context *ftdi;
+	if ((ftdi = ftdi_new()) == 0)
+	{
+		fprintf(stderr, "ftdi_new failed\n");
+		return EXIT_FAILURE;
+	}
+	if ((ret = ftdi_usb_open(ftdi, 0x0403, 0x6001)) < 0)
+	{
+		fprintf(stderr, "unable to open ftdi device: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		ftdi_free(ftdi);
+		return EXIT_FAILURE;
+	}
+	// Read out FTDIChip-ID of R type chips
+	if (ftdi->type == TYPE_R)
+	{
+		unsigned int chipid;
+		printf("ftdi_read_chipid: %d\n", ftdi_read_chipid(ftdi, &chipid));
+		printf("FTDI chipid: %X\n", chipid);
+	}
+	ret = ftdi_set_line_property(ftdi, 8, STOP_BIT_2, NONE);
+	if (ret < 0)
+	{
+		fprintf(stderr, "unable to set line parameters: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		exit(-1);
+	}
+	ret = ftdi_set_baudrate(ftdi, 250000);
+	if (ret < 0)
+	{
+		fprintf(stderr, "unable to set baudrate: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		exit(-1);
+	}
+#endif
+
 	while(running) {
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev)) {
@@ -473,11 +513,50 @@ int main(int argc __attribute__((__unused__)), char *argv[] __attribute__((__unu
 			}
 		}
 
+#ifdef LIBFTDI
+		ret = ftdi_set_line_property2(ftdi, 8, STOP_BIT_2, NONE,BREAK_ON);
+		if (ret < 0)
+		{
+			fprintf(stderr, "unable to set line parameters: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+			exit(-1);
+		}
+		usleep(100);
+		ret = ftdi_set_line_property2(ftdi, 8, STOP_BIT_2, NONE,BREAK_OFF);
+		if (ret < 0)
+		{
+			fprintf(stderr, "unable to set line parameters: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+			exit(-1);
+		}
+		unsigned char c=0;
+
+		ret = ftdi_write_data(ftdi, &c, 0);
+		if (ret < 0)
+		{
+			fprintf(stderr,"write failed , error %d (%s)\n",ret, ftdi_get_error_string(ftdi));
+		}
+		usleep(10);
+
+		//ret = ftdi_write_data(ftdi, ch, 65);
+		if (ret < 0)
+		{
+			fprintf(stderr,"write failed , error %d (%s)\n",ret, ftdi_get_error_string(ftdi));
+		}
+#endif
 
 
 		SDL_Flip(screen);
 		SDL_Delay(20);
 	}
+
+#ifdef LIBFTDI
+	if ((ret = ftdi_usb_close(ftdi)) < 0)
+	{
+		fprintf(stderr, "unable to close ftdi device: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		ftdi_free(ftdi);
+		return EXIT_FAILURE;
+	}
+	ftdi_free(ftdi);
+#endif
 
 	SDL_Quit();
 	return 0;

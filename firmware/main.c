@@ -33,7 +33,7 @@
 #include "main.h"
 #include "menu/menu_main.h"
 #include "menu/menu_setup.h"
-#include "lcd_a/stmpe811qtr.h"
+#include "lcd_a/STMPE811QTR.h"
 
 #include "tlsf.h"
 #include "my_malloc.h"

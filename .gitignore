@@ -8,3 +8,4 @@ firmware/tools/gdbserver/*.o
 firmware/tools/gdbserver/st-util
 firmware/STM32F4_drivers/build/libSTM32F4xx_drivers.a
 firmware/STM32F4_drivers/build/.bin
+sim/*.dmx

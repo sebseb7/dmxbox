@@ -19,7 +19,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stmpe811qtr.h"
+#include "STMPE811QTR.h"
 
 /** @defgroup STM32F4xx_StdPeriph_Examples
   * @{

@@ -31,8 +31,9 @@ endif
 LIB_SOURCES=$(wildcard storage/*.c libs/*.c ../libs/*.c ../libs/menu/*.c ../libs/mcugui/*.c)
 LIB_HEADERS=$(wildcard storage/*.h libs/*.h ../libs/*.h ../libs/menu/*.h ../libs/mcugui/*.h)
 
-FLAGS+= -DLIBFTDI 
-LDFLAGS+= -lftdi1 
+#echo "int main(){}" | gcc -o /dev/null -x c - -lftdi1 2>/dev/null
+FLAGS+= -DLIBFTDI
+LDFLAGS+= -lftdi1
 
 all: sim
 
